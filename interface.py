@@ -1,9 +1,11 @@
+import math
+import sys
+from tkinter import messagebox, simpledialog
+
 import numpy as np
 import pygame
-import sys
-import math
+
 import Button as btn
-from tkinter import messagebox, simpledialog
 
 #   Window Dimensions   #
 WIDTH = 1050
@@ -60,6 +62,7 @@ EMPTY_CELL = 0
 TURN = 1
 GAME_OVER = False
 player1score = player2score = 0
+depth = 1
 
 
 def setupFrame():
@@ -68,13 +71,29 @@ def setupFrame():
     """
     global screen, board
     screen = pygame.display.set_mode(WINDOW_SIZE)
-    gradientRect(screen, BLACK, GREY, pygame.draw.rect(screen, SCREEN_BACKGROUND, (0, 0, WIDTH, HEIGHT)))
     board = createBoard(EMPTY_CELL)
-
     pygame.display.set_caption('Smart Connect4 :)')
+    refreshFrame()
+
+
+def refreshFrame():
+    """
+    Refreshes the screen and all the components
+    """
+    refreshBackground()
     drawBoard()
+    drawButtons()
     drawLabels()
     drawButtons()
+    refreshStats()
+    refreshScores()
+
+
+def refreshBackground():
+    """
+    Refreshes screen background
+    """
+    gradientRect(screen, BLACK, GREY, pygame.draw.rect(screen, SCREEN_BACKGROUND, (0, 0, WIDTH, HEIGHT)))
 
 
 ######   Labels    ######
@@ -92,6 +111,10 @@ def drawLabels():
     player2ScoreCaption = captionFont.render("Player2", True, BLACK)
     screen.blit(player1ScoreCaption, (BOARD_LAYOUT_END_X + 48, 210))
     screen.blit(player2ScoreCaption, (BOARD_LAYOUT_END_X + 170, 210))
+
+    depthFont = pygame.font.SysFont("Serif", 23-len(str(depth)))
+    depthLabel = depthFont.render("k = " + str(depth), True, BLACK)
+    screen.blit(depthLabel, (WIDTH - 100, 294))
 
     refreshScores()
     refreshStats()
@@ -129,9 +152,8 @@ def refreshStats():
     """
     Refreshes the analysis section
     """
-    pygame.draw.rect(screen, BLACK, (BOARD_LAYOUT_END_X + 9, 299, WIDTH - BOARD_LAYOUT_END_X - 18, 337), 0)
-    statRect = pygame.draw.rect(screen, GREY,
-                                (BOARD_LAYOUT_END_X + 10, 300, WIDTH - BOARD_LAYOUT_END_X - 20, 335))
+    pygame.draw.rect(screen, BLACK, (BOARD_LAYOUT_END_X + 9, 329, WIDTH - BOARD_LAYOUT_END_X - 18, 307), 0)
+    pygame.draw.rect(screen, GREY, (BOARD_LAYOUT_END_X + 10, 330, WIDTH - BOARD_LAYOUT_END_X - 20, 305))
 
 
 ######   Buttons    ######
@@ -140,12 +162,18 @@ def drawButtons():
     """
     Draws all buttons on the screen
     """
-    global showStatsButton, contributorsButton
+    global showStatsButton, contributorsButton, modifyDepthButton
     showStatsButton = btn.Button(
         screen, color=LIGHTGREY,
         x=BOARD_LAYOUT_END_X + 10, y=250,
         width=WIDTH - BOARD_LAYOUT_END_X - 20, height=30, text="Show nerdy stats :D")
     showStatsButton.draw(BLACK)
+
+    modifyDepthButton = btn.Button(
+        screen, color=LIGHTGREY,
+        x=BOARD_LAYOUT_END_X + 10, y=290,
+        width=WIDTH - BOARD_LAYOUT_END_X - 120, height=30, text="Modify depth k")
+    modifyDepthButton.draw(BLACK)
 
     contributorsButton = btn.Button(
         screen, color=LIGHTGREY,
@@ -301,15 +329,23 @@ def buttonResponseToMouseEvent(event):
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
             alterButtonAppearance(contributorsButton, WHITE, BLACK)
+        elif modifyDepthButton.hover(event.pos):
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+            alterButtonAppearance(modifyDepthButton, WHITE, BLACK)
         else:
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
             alterButtonAppearance(showStatsButton, LIGHTGREY, BLACK)
+            alterButtonAppearance(contributorsButton, LIGHTGREY, BLACK)
+            alterButtonAppearance(modifyDepthButton, LIGHTGREY, BLACK)
 
     if event.type == pygame.MOUSEBUTTONDOWN:
         if showStatsButton.hover(event.pos):
             alterButtonAppearance(showStatsButton, CYAN, BLACK)
         elif contributorsButton.hover(event.pos):
             alterButtonAppearance(contributorsButton, CYAN, BLACK)
+        elif modifyDepthButton.hover(event.pos):
+            alterButtonAppearance(modifyDepthButton, CYAN, BLACK)
 
     if event.type == pygame.MOUSEBUTTONUP:
         if showStatsButton.hover(event.pos):
@@ -317,6 +353,20 @@ def buttonResponseToMouseEvent(event):
         elif contributorsButton.hover(event.pos):
             alterButtonAppearance(contributorsButton, LIGHTGREY, BLACK)
             showContributors()
+        elif modifyDepthButton.hover(event.pos):
+            alterButtonAppearance(modifyDepthButton, LIGHTGREY, BLACK)
+            takeNewDepth()
+
+
+def takeNewDepth():
+    """
+    Invoked at pressing modify depth button. Displays a simple dialog that takes input depth from user
+    """
+    global depth
+    temp = simpledialog.askinteger('Enter depth', 'Enter depth k')
+    if temp is not None and temp > 0:
+        depth = temp
+    refreshFrame()
 
 
 def showContributors():
