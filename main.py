@@ -10,7 +10,6 @@ class Board:
 
 BOARD = Board()
 
-
 """
 1- Good heuristic function aka make the function a linear weighted sum of the features
 2- Transpositional Table
@@ -19,13 +18,28 @@ BOARD = Board()
 5- Enhance the exploring order by exploring best moves first aka moves which places new item near to existing one
 """
 
-
 def decimalToBinary2(n):
     return "{0:b}".format(int(n))
 
 def convertToTwoDimensions(state):
-    
-    return True
+    twoDimensionalArray = [[]]
+
+    for i in range(0,6):
+        twoDimensionalArray.insert(i, [-1, -1, -1, -1, -1, -1, -1])
+    k = 60
+    startingBits = [59, 50, 41, 32, 23, 14, 5]
+    for j in range(0, 7):
+        lastLocation = (((7<<k) & state) >>k )-1
+        k-=9
+        for row in range(0,lastLocation):
+            currentBit = ((1<<(startingBits[j]-row))&state)>>(startingBits[j]-row)
+            twoDimensionalArray[row][j] = currentBit
+
+
+    return twoDimensionalArray
+
+print(convertToTwoDimensions(18067701387263464938))
+
 
 def getChildren(next_color, state):
     print(decimalToBinary2(state))
