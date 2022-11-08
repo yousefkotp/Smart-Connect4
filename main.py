@@ -172,43 +172,6 @@ def isGameOver(state):
 def getValue(state):
     return True
 
-
-# 1100
-# k-1
-# print(1<<2&12)
-# # 1 010100000 010100000 010100000 010100000 010100000 010100000 010100000 
-
-# x=int('0101000000101000000101000000101000000101000000101000000101000001', 2)
-# print(x) 
-# print(len('0101000000101000000101000000101000000101000000101000000101000001'))
-
-# #law 3ayez agib el rakam el fl awel 
-# # awl makan
-# print(1<<63 & x)
-# print(1<<(54) & x)
-# awl  makan k=63 62 61    (60,59,58,57,56,55)
-# tany makan k=54 53 52    (56,56,56,56,56,56)
-# tany
-# string=""
-# def DecimalToBinary(num):
-#         global string
-#         if num >= 1:
-#             DecimalToBinary(num // 2)
-#             string+=str( (num % 2) )
-
-# def printBinaryVal(num):
-#     global string    
-#     DecimalToBinary(num)
-#     print(string)
-#     string=""
-#     return
-
-
-# print("-----------")
-# for i in range(0,9):
-#     print(i)
-
-# kosom el byson
 getChildren(1, int("1010100000010100000010100000010100000010100000010100000010100000", 2))
 # print((int("1010100000010100000010100000010100000010100000010100000010100000",2)))
 # print(bin(1010100000010100000010100000010100000010100000010100000010100000))
@@ -234,7 +197,7 @@ getChildren(1, int("101010000001010000001010000001010000001010000001010000001010
 #         # print(string)
 #         # string=""
 #         temp=((7<<(k-2))&state)>>(k-2)
-#         print(temp) 
+#         print(temp)
 #         # if(1<<k & state):
 #         #      next_zero_binary+="1"
 #         # else:
@@ -246,7 +209,7 @@ getChildren(1, int("101010000001010000001010000001010000001010000001010000001010
 #         # if(1<<(k-2) & state):
 #         #      next_zero_binary+="1"
 #         # else:
-#         #      next_zero_binary+="0"      
+#         #      next_zero_binary+="0"
 
 
 #         # arr.append(next_zero_binary)
@@ -262,6 +225,6 @@ getChildren(1, int("101010000001010000001010000001010000001010000001010000001010
 #     #     arkam.append(int(next_zero_binary,2))
 
 #     # print(arr)
-#     # print(arkam)                
+#     # print(arkam)
 
 #     return arr
