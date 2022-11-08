@@ -44,6 +44,99 @@ def convertToTwoDimensions(state):
 
 
 
+
+
+
+#3  points for 4 -sure point
+#2  points for 3 -candidate point
+#1  point  for 2 -candidate point
+#-4 points for 4 -sure opponent point
+#-3 points for 3 -candidate opponent point
+#-2 points for 2 -candidate opponent point
+
+
+# the value is
+
+
+# 1 us
+# 0 user
+def check_neigbours( x , y , value , array ):
+    cost=0
+    map={}
+    map[value]=1
+    map[-1]=0
+    if x <= 2:
+        temp=0
+        for i in range (0,4):
+            if array[x+i][y] not in map:
+                temp+=-50
+            else:
+                temp+=map[array[x+i][y]]
+        if temp>1:
+            if (value == 1):
+                print(str(temp) + " second cond")
+            else:
+                print("-"+str(temp) +" second cond")
+            cost+=temp
+
+    if y <= 3:
+        temp=0
+        for i in range(0,4):
+            if array[x][y+i] not in map:
+                temp+=-50
+            else:
+                temp+=map[array[x][y+i]]
+        if temp>1:
+            if(value==1):
+                print(str(temp) +" second cond")
+            else:
+                print("-"+str(temp) +" second cond")
+            cost+=temp
+
+    if x <= 2 and y <= 3:
+        temp=0
+        for i in range(0,4):
+            if array[x+i][y+i] not in map:
+                temp += -50
+            else:
+                temp += map[array[x+i][y+i]]
+        if temp >1:
+            if (value == 1):
+                print(str(temp) + " second cond")
+            else:
+                print("-"+str(temp) +" second cond")
+            cost += temp
+
+    if value == 1:
+        return cost
+    else:
+        return -cost
+
+def  heuristic(state):
+    array=convertToTwoDimensions(state)
+    print((array))
+
+    value=0
+    for i in range(0,6):
+        for j in range(0,7):
+            print(str(i)+"--"+str(j))
+            if array[i][j] != -1:
+                value+=check_neigbours(i,j,array[i][j],array)
+    return value;
+
+
+print("---------------")
+print(heuristic(int("1011100000100100000101110000100111000010100000001000000001000000",2)))
+
+# print(heuristic(int("1010100000010100000010100000010100000010100000010100000010100000",2)))
+print("---------------")
+
+
+
+
+
+
+
 def set_bit(value, bit):
     return value | (1 << bit)
 
