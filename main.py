@@ -6,8 +6,11 @@ class Board:
     def __init__(self):
         self.state = 1 << 63
         self.maxDepth = interface.depth
+        self.mapStates={}
+
 
 BOARD = Board()
+
 
 """
 1- Good heuristic function aka make the function a linear weighted sum of the features
@@ -47,10 +50,11 @@ def miniMax(maxDepth, depth, isMaxPlayer, state):
     if depth == maxDepth or isGameOver(state):
         return (state, getValue(state))
 
+    children = getChildren(state)
+    BOARD.mapStates[state]=children
     if isMaxPlayer:
         maxChild = None
         maxValue = -math.inf
-        children = getChildren(state)
         for child in children:
             childValue = miniMax(maxDepth, depth + 1, not isMaxPlayer, child)[1]
             if childValue > maxValue:
@@ -60,7 +64,6 @@ def miniMax(maxDepth, depth, isMaxPlayer, state):
     else:
         minChild = None
         minValue = math.inf
-        children = getChildren(state)
         for child in children:
             childValue = miniMax(maxDepth, depth + 1, not isMaxPlayer, child)[1]
             if childValue > minValue:
