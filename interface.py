@@ -2,10 +2,9 @@ import math
 import sys
 import tkinter as tk
 from tkinter import messagebox, simpledialog
-import header
+
 import numpy as np
 import pygame
-
 win = tk.Tk();
 win.withdraw()
 #   Window Dimensions   #
@@ -489,9 +488,9 @@ def gameSession():
                         pygame.mouse.set_visible(True)
                         refreshFrame()
 
-                    numericState = header.main.convertToNumber(GAME_BOARD.copy())
-                    boardState = header.main.nextMove(alphaBetaPruning=usePruning, state=numericState)
-                    newState = header.main.convertToTwoDimensions(numericState)
+                    numericState = main.convertToNumber(GAME_BOARD.copy())
+                    boardState = main.nextMove(alphaBetaPruning=usePruning, state=numericState)
+                    newState = main.convertToTwoDimensions(numericState)
                     print(str(numericState) + " " + str(newState))
                     # pieceLocation = getNewMove(newState, GAME_BOARD)
                     # GAME_BOARD = newState

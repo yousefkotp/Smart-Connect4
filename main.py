@@ -1,9 +1,5 @@
 import math
-
-import numpy as np
-
-import header
-
+import interface
 
 # 1: max, 0 min
 
@@ -11,7 +7,7 @@ import header
 class Board:
     def __init__(self):
         self.state = 1 << 63
-        self.maxDepth = header.interface.DEPTH
+        self.maxDepth = interface.DEPTH
         self.mapStates = {}
 
 
@@ -31,8 +27,10 @@ def decimalToBinary2(n):
 
 
 def convertToTwoDimensions(state):
-    twoDimensionalArray = np.full((header.interface.ROW_COUNT, header.interface.COLUMN_COUNT), -1)
+    twoDimensionalArray = []
 
+    for i in range(0, 6):
+        twoDimensionalArray.insert(i, [-1, -1, -1, -1, -1, -1, -1])
     k = 60
     startingBits = [59, 50, 41, 32, 23, 14, 5]
     for j in range(0, 7):
@@ -41,30 +39,11 @@ def convertToTwoDimensions(state):
         for row in range(0, lastLocation):
             currentBit = ((1 << (startingBits[j] - row)) & state) >> (startingBits[j] - row)
             twoDimensionalArray[row][j] = currentBit
-
-    print(twoDimensionalArray)
-
     return twoDimensionalArray
 
 
-def convertToNumber(twoDimensionalState):
-    for i in range(0, header.interface.ROW_COUNT):
-        for j in range(0, header.interface.COLUMN_COUNT):
-            twoDimensionalState[i][j] -= 1
-
-    print("converting to num: " + str(twoDimensionalState))
-
-    n = 17309616014371291584  # Equivalent to 111000000 for all columns
-    startingBits = [59, 50, 41, 32, 23, 14, 5]
-    for j in range(0, 7):
-        for i in range(0, 6):
-            if twoDimensionalState[i][j] == 1:
-                n = set_bit(n, startingBits[j] - i)
-    return n
 
 
-# max =1
-# min =0
 def set_bit(value, bit):
     return value | (1 << bit)
 
@@ -72,19 +51,21 @@ def set_bit(value, bit):
 def clear_bit(value, bit):
     return value & ~(1 << bit)
 
+def convertToNumber(twoDimensionalState):
+    n = 17309616014371291584 # Equivalent to 111000000 for each column
+    k=60
+    startingBits = [59, 50, 41, 32, 23, 14, 5]
+    for j in range(0, 7):
+        for i in range(0, 6):
+            if twoDimensionalState[i][j] == 1:
+                n = set_bit(n, startingBits[j] - i)
+            elif twoDimensionalState[i][j]==-1:
+                n = ((7 << (k)) & n)
+        k-=9
+    return n
 
-test = [[0, 0, 0, 0, 0, 0, 0, ],
-        [0, 0, 0, 0, 0, 0, 0, ],
-        [0, 0, 0, 0, 0, 0, 1, ],
-        [0, 0, 0, 0, 1, 0, 2, ],
-        [0, 0, 0, 0, 2, 1, 0, ],
-        [0, 0, 0, 0, 0, 0, 1, ]]
-# print("HE2: " + str(convertToTwoDimensions(18067701387263464938)))
-print("HE2: " + str(test))
-print("ME2: " + str(convertToNumber(test)))
-print("TE2: " + str(convertToTwoDimensions(convertToNumber(test))))
-# print("ME3: " + str(convertToNumber(test)))
-# print("TE3: " + str(convertToTwoDimensions(convertToNumber(test))))
+# max =1
+# min =0
 
 
 def getChildren(player, state):
