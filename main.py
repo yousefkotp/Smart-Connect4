@@ -91,7 +91,7 @@ def getChildren(player, state):
     return children
 
 
-def nextMove(alphaBetaPruning, state):
+def nextMove(alphaBetaPruning, state):  # The function returns the next best state in integer form
     if alphaBetaPruning:
         return miniMaxAlphaBeta(BOARD.maxDepth, 0, 1, state, -math.inf, math.inf)[0]
     return miniMax(BOARD.maxDepth, 0, 1, state)[0]
