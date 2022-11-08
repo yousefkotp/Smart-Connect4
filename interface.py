@@ -5,7 +5,6 @@ from tkinter import messagebox, simpledialog
 import numpy as np
 import pygame
 
-import Button as btn
 
 #   Window Dimensions   #
 WIDTH = 1050
@@ -188,20 +187,20 @@ def drawButtons():
     Draws all buttons on the screen
     """
     global showStatsButton, contributorsButton, modifyDepthButton, playAgainButton, pruningCheckbox
-    contributorsButton = btn.Button(
+    contributorsButton = Button(
         screen, color=LIGHTGREY,
         x=BOARD_LAYOUT_END_X + 10, y=650,
         width=WIDTH - BOARD_LAYOUT_END_X - 20, height=30, text="Contributors")
     contributorsButton.draw(BLACK)
 
     if not GAME_OVER:
-        modifyDepthButton = btn.Button(
+        modifyDepthButton = Button(
             screen, color=LIGHTGREY,
             x=BOARD_LAYOUT_END_X + 10, y=290,
             width=WIDTH - BOARD_LAYOUT_END_X - 120, height=30, text="Modify depth k")
         modifyDepthButton.draw(BLACK)
 
-        pruningCheckbox = btn.Button(
+        pruningCheckbox = Button(
             screen, color=WHITE,
             x=BOARD_LAYOUT_END_X + 35, y=340,
             width=20, height=20, text="",
@@ -214,12 +213,12 @@ def drawButtons():
     else:
         showStatsButton_Y = 330
 
-        playAgainButton = btn.Button(
+        playAgainButton = Button(
             screen=screen, color=GOLD, x=BOARD_LAYOUT_END_X + 10, y=BOARD_BEGIN_Y + 100,
             width=WIDTH - BOARD_LAYOUT_END_X - 20, height=120, text="Play Again")
         playAgainButton.draw()
 
-    showStatsButton = btn.Button(
+    showStatsButton = Button(
         screen, color=LIGHTGREY,
         x=BOARD_LAYOUT_END_X + 10, y=showStatsButton_Y,
         width=WIDTH - BOARD_LAYOUT_END_X - 20, height=30, text="Show nerdy stats :D")
@@ -550,6 +549,57 @@ def isWithinBounds(mat, r, c) -> bool:
     """
     return 0 <= r <= len(mat) and 0 <= c <= len(mat[0])
 
+class Button:
+    def __init__(self, screen, color, x, y, width, height, text='', isChecked=False, gradCore=False, coreLeftColor=None,
+                 coreRightColor=None, gradOutline=False, outLeftColor=None, outRightColor=None):
+        self.color = color
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.text = text
+        self.screen = screen
+        self.isChecked = isChecked
+        self.gradCore = gradCore
+        self.coreLeftColor = coreLeftColor
+        self.coreRightColor = coreRightColor
+        self.gradOutline = gradOutline
+        self.outLeftColor = outLeftColor
+        self.outRightColor = outRightColor
+
+    def draw(self, outline=None, outlineThickness=2, font='comicsans', fontSize=15, ):
+        """
+        Draws the button on screen
+        :param outline: Outline color
+        :param font: Font Name
+        :param fontSize: Font Size
+        """
+        if outline:
+            rectOutline = pygame.draw.rect(self.screen, outline, (self.x, self.y,
+                                                                  self.width, self.height), 0)
+            if self.gradOutline:
+                gradientRect(self.screen, self.outLeftColor, self.outRightColor, rectOutline)
+        button = pygame.draw.rect(self.screen, self.color, (self.x + outlineThickness, self.y + outlineThickness,
+                                                            self.width - 2 * outlineThickness,
+                                                            self.height - 2 * outlineThickness), 0)
+        if self.gradCore:
+            gradientRect(self.screen, self.coreLeftColor, self.coreRightColor, button, self.text, font, fontSize)
+
+        if self.text != '':
+            font = pygame.font.SysFont(font, fontSize)
+            text = font.render(self.text, True, (0, 0, 0))
+            self.screen.blit(text, (
+                self.x + (self.width / 2 - text.get_width() / 2), self.y + (self.height / 2 - text.get_height() / 2)))
+
+        return self, button
+
+    def isOver(self, pos):
+        # Pos is the mouse position or a tuple of (x,y) coordinates
+        if self.x < pos[0] < self.x + self.width:
+            if self.y < pos[1] < self.y + self.height:
+                return True
+
+        return False
 
 if __name__ == '__main__':
     pygame.init()

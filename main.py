@@ -1,7 +1,6 @@
 import math
 import interface
-
-
+# 1:
 class Board:
     def __init__(self):
         self.state = 1 << 63
