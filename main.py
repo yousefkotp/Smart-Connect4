@@ -41,18 +41,38 @@ def convertToTwoDimensions(state):
 print(convertToTwoDimensions(18067701387263464938))
 
 
-def getChildren(next_color, state):
+# max =1
+# min =0
+def set_bit(value, bit):
+    return value | (1<<bit)
+
+def clear_bit(value, bit):
+    return value & ~(1<<bit)
+
+def getChildren(player, state):
     print(decimalToBinary2(state))
-    # printBinaryVal(state)
     k = 60
-    arr = []
+    children = []
     for i in range(0, 7):
         temp = ((7 << (k)) & state) >> (k)
-        # print(temp)
-        state = state | (1 << (k - temp))
-        print(decimalToBinary2(state))
-        k -= 9
-    return arr
+        print(i)
+        if player == 1 and temp != 7:
+            state = state | (1 << (k - temp))
+            state= clear_bit(state,k)
+            state= clear_bit(state,k+1)
+            state =clear_bit(state,k+2)
+            state = state | ((temp + 1)<<k)
+            print(decimalToBinary2(state))
+        elif player == 0 and temp !=7:
+            state= clear_bit(state,k-temp)
+            state = clear_bit(state, k)
+            state = clear_bit(state, k + 1)
+            state = clear_bit(state, k + 2)
+            state = state | ((temp + 1)<<k)
+            print(decimalToBinary2(state))
+        k-=9
+    return children
+
 
 
 def nextMove(alphaBetaPruning, state):
