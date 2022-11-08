@@ -1,7 +1,14 @@
 import math
 import interface
-maxDepth = 10
-BOARD = 1<<63
+
+
+class Board:
+    def __init__(self):
+        self.state = 1 << 63
+        self.maxDepth = interface.depth
+
+BOARD = Board()
+
 """
 1- Good heuristic function aka make the function a linear weighted sum of the features
 2- Transpositional Table
@@ -31,10 +38,9 @@ def getChildren(next_color, state):
 
 
 def nextMove(alphaBetaPruning, state):
-    global maxDepth
     if alphaBetaPruning:
-        return miniMaxAlphaBeta(maxDepth, 0, 1, state, -math.inf, math.inf)[0]
-    return miniMax(maxDepth, 0, 1, state)[0]
+        return miniMaxAlphaBeta(BOARD.maxDepth, 0, 1, state, -math.inf, math.inf)[0]
+    return miniMax(BOARD.maxDepth, 0, 1, state)[0]
 
 
 def miniMax(maxDepth, depth, isMaxPlayer, state):
@@ -64,7 +70,7 @@ def miniMax(maxDepth, depth, isMaxPlayer, state):
 
 
 def miniMaxAlphaBeta(maxDepth, depth, isMaxPlayer, state, alpha, beta):
-    if depth == maxDepth or isGameOver:
+    if depth == maxDepth or isGameOver(state):
         return (state, getValue(state))
 
     if isMaxPlayer:
@@ -98,8 +104,8 @@ def miniMaxAlphaBeta(maxDepth, depth, isMaxPlayer, state, alpha, beta):
 
 
 # Check if the board is full
-def isGameOver():
-    return interface.GAME_OVER
+def isGameOver(state):
+    return False
 
 
 # Fitness/Heuristic Function

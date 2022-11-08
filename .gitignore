@@ -6,3 +6,4 @@ __pycache__/Button.cpython-39.pyc
 .idea/inspectionProfiles/profiles_settings.xml
 .idea/connect4.iml
 .idea/*
+__pycache__/interface.cpython-39.pyc
