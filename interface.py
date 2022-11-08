@@ -5,6 +5,7 @@ from tkinter import messagebox, simpledialog
 import header
 import numpy as np
 import pygame
+
 win = tk.Tk();
 win.withdraw()
 #   Window Dimensions   #
@@ -74,6 +75,7 @@ usePruning = True
 
 def getDepth():
     return DEPTH
+
 
 def setupFrame():
     """
@@ -479,7 +481,7 @@ def gameSession():
                         pieceLocation = dropPiece(column, TURN)
                         PLAYER_SCORE[TURN] += sequencesFormed(pieceLocation, TURN)
                         switchTurn()
-                        # printBoard()
+                        printBoard()
                         refreshFrame()
 
                     if boardIsFull():
@@ -487,9 +489,12 @@ def gameSession():
                         pygame.mouse.set_visible(True)
                         refreshFrame()
 
-                    # boardState = header.main.nextMove(usePruning, header.main.convertToNumber(GAME_BOARD))
-                    # newState = header.main.convertToTwoDimensions(boardState)
+                    numericState = header.main.convertToNumber(GAME_BOARD.copy())
+                    boardState = header.main.nextMove(alphaBetaPruning=usePruning, state=numericState)
+                    newState = header.main.convertToTwoDimensions(numericState)
+                    print(str(numericState) + " " + str(newState))
                     # pieceLocation = getNewMove(newState, GAME_BOARD)
+                    # GAME_BOARD = newState
                     # PLAYER_SCORE[TURN] += sequencesFormed(pieceLocation, TURN)
                     # printBoard()
                     # switchTurn()
@@ -503,7 +508,8 @@ def resetEverything():
     TURN = 1
     setupFrame()
 
-def getNewMove(newState, oldState):
+
+def getNewMove(newState, oldState) -> tuple:
     for r in range(ROW_COUNT):
         for c in range(COLUMN_COUNT):
             if newState[r][c] != oldState[r][c]:
@@ -533,18 +539,22 @@ def sequencesFormed(pieceLocation, piece) -> int:
     # Check horizontal locations for win
     count = 0
     if 0 <= c <= COLUMN_COUNT - 4:
-        if GAME_BOARD[r][c] == piece and GAME_BOARD[r][c + 1] == piece and GAME_BOARD[r][c + 2] == piece and GAME_BOARD[r][c + 3] == piece:
+        if GAME_BOARD[r][c] == piece and GAME_BOARD[r][c + 1] == piece and GAME_BOARD[r][c + 2] == piece and \
+                GAME_BOARD[r][c + 3] == piece:
             count += 1
     if 3 <= c:
-        if GAME_BOARD[r][c] == piece and GAME_BOARD[r][c - 1] == piece and GAME_BOARD[r][c - 2] == piece and GAME_BOARD[r][c - 3] == piece:
+        if GAME_BOARD[r][c] == piece and GAME_BOARD[r][c - 1] == piece and GAME_BOARD[r][c - 2] == piece and \
+                GAME_BOARD[r][c - 3] == piece:
             count += 1
 
     # Check vertical locations for win
     if 0 <= r <= ROW_COUNT - 4:
-        if GAME_BOARD[r][c] == piece and GAME_BOARD[r + 1][c] == piece and GAME_BOARD[r + 2][c] == piece and GAME_BOARD[r + 3][c] == piece:
+        if GAME_BOARD[r][c] == piece and GAME_BOARD[r + 1][c] == piece and GAME_BOARD[r + 2][c] == piece and \
+                GAME_BOARD[r + 3][c] == piece:
             count += 1
     if 3 <= r:
-        if GAME_BOARD[r][c] == piece and GAME_BOARD[r - 1][c] == piece and GAME_BOARD[r - 2][c] == piece and GAME_BOARD[r - 3][c] == piece:
+        if GAME_BOARD[r][c] == piece and GAME_BOARD[r - 1][c] == piece and GAME_BOARD[r - 2][c] == piece and \
+                GAME_BOARD[r - 3][c] == piece:
             count += 1
 
     # Check -> diagonals

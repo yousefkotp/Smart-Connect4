@@ -1,5 +1,9 @@
 import math
+
+import numpy as np
+
 import header
+
 
 # 1: max, 0 min
 
@@ -27,10 +31,8 @@ def decimalToBinary2(n):
 
 
 def convertToTwoDimensions(state):
-    twoDimensionalArray = []
+    twoDimensionalArray = np.full((header.interface.ROW_COUNT, header.interface.COLUMN_COUNT), -1)
 
-    for i in range(0, 6):
-        twoDimensionalArray.insert(i, [-1, -1, -1, -1, -1, -1, -1])
     k = 60
     startingBits = [59, 50, 41, 32, 23, 14, 5]
     for j in range(0, 7):
@@ -39,19 +41,25 @@ def convertToTwoDimensions(state):
         for row in range(0, lastLocation):
             currentBit = ((1 << (startingBits[j] - row)) & state) >> (startingBits[j] - row)
             twoDimensionalArray[row][j] = currentBit
+
+    print(twoDimensionalArray)
+
     return twoDimensionalArray
 
 
-print(convertToTwoDimensions(18067701387263464938))
-
-
 def convertToNumber(twoDimensionalState):
+    for i in range(0, header.interface.ROW_COUNT):
+        for j in range(0, header.interface.COLUMN_COUNT):
+            twoDimensionalState[i][j] -= 1
+
+    print("converting to num: " + str(twoDimensionalState))
+
     n = 17309616014371291584  # Equivalent to 111000000 for all columns
     startingBits = [59, 50, 41, 32, 23, 14, 5]
     for j in range(0, 7):
         for i in range(0, 6):
             if twoDimensionalState[i][j] == 1:
-                set_bit(n, startingBits[j] - i)
+                n = set_bit(n, startingBits[j] - i)
     return n
 
 
@@ -63,6 +71,20 @@ def set_bit(value, bit):
 
 def clear_bit(value, bit):
     return value & ~(1 << bit)
+
+
+test = [[0, 0, 0, 0, 0, 0, 0, ],
+        [0, 0, 0, 0, 0, 0, 0, ],
+        [0, 0, 0, 0, 0, 0, 1, ],
+        [0, 0, 0, 0, 1, 0, 2, ],
+        [0, 0, 0, 0, 2, 1, 0, ],
+        [0, 0, 0, 0, 0, 0, 1, ]]
+# print("HE2: " + str(convertToTwoDimensions(18067701387263464938)))
+print("HE2: " + str(test))
+print("ME2: " + str(convertToNumber(test)))
+print("TE2: " + str(convertToTwoDimensions(convertToNumber(test))))
+# print("ME3: " + str(convertToNumber(test)))
+# print("TE3: " + str(convertToTwoDimensions(convertToNumber(test))))
 
 
 def getChildren(player, state):
@@ -172,6 +194,7 @@ def isGameOver(state):
 # Fitness/Heuristic Function
 def getValue(state):
     return True
+
 
 getChildren(1, int("1010100000010100000010100000010100000010100000010100000010100000", 2))
 # print((int("1010100000010100000010100000010100000010100000010100000010100000",2)))
