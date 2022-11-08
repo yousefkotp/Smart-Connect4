@@ -54,22 +54,24 @@ def getChildren(player, state):
     k = 60
     children = []
     for i in range(0, 7):
-        temp = ((7 << (k)) & state) >> (k)
-        print(i)
+        temp_state=state
+        temp = ((7 << (k)) & temp_state) >> (k)
         if player == 1 and temp != 7:
-            state = state | (1 << (k - temp))
-            state= clear_bit(state,k)
-            state= clear_bit(state,k+1)
-            state =clear_bit(state,k+2)
-            state = state | ((temp + 1)<<k)
-            print(decimalToBinary2(state))
+            temp_state = state | (1 << (k - temp))
+            temp_state= clear_bit(temp_state,k)
+            temp_state= clear_bit(temp_state,k+1)
+            temp_state= clear_bit(temp_state,k+2)
+            temp_state = temp_state | ((temp + 1)<<k)
+            print(decimalToBinary2(temp_state))
+            children.append(temp_state)
         elif player == 0 and temp !=7:
-            state= clear_bit(state,k-temp)
-            state = clear_bit(state, k)
-            state = clear_bit(state, k + 1)
-            state = clear_bit(state, k + 2)
-            state = state | ((temp + 1)<<k)
-            print(decimalToBinary2(state))
+            temp_state = clear_bit(temp_state,k-temp)
+            temp_state = clear_bit(temp_state, k)
+            temp_state = clear_bit(temp_state, k + 1)
+            temp_state = clear_bit(temp_state, k + 2)
+            temp_state = temp_state | ((temp + 1)<<k)
+            children.append(temp_state)
+            print(decimalToBinary2(temp_state))
         k-=9
     return children
 
