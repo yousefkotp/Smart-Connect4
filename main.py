@@ -2,7 +2,6 @@ import math
 import interface
 maxDepth = 10
 BOARD = 1<<63
-GAME_OVER = interface.GAME_OVER
 """
 1- Good heuristic function aka make the function a linear weighted sum of the features
 2- Transpositional Table
@@ -16,7 +15,7 @@ def decimalToBinary2(n):
     return "{0:b}".format(int(n))
 
 
-# VERY IMPORTAN!!! WE SHOULD MAKE SURE THAT WHEN THE CHILD IS 111 AKA MYNF3SH YA5OD AKTR
+# VERY IMPORTANT!!! WE SHOULD MAKE SURE THAT WHEN THE CHILD IS 111 AKA MYNF3SH YA5OD AKTR
 def getChildren(next_color, state):
     print(decimalToBinary2(state))
     # printBinaryVal(state)
@@ -65,7 +64,7 @@ def miniMax(maxDepth, depth, isMaxPlayer, state):
 
 
 def miniMaxAlphaBeta(maxDepth, depth, isMaxPlayer, state, alpha, beta):
-    if depth == maxDepth or isGameOver(state):
+    if depth == maxDepth or isGameOver:
         return (state, getValue(state))
 
     if isMaxPlayer:
@@ -99,9 +98,8 @@ def miniMaxAlphaBeta(maxDepth, depth, isMaxPlayer, state, alpha, beta):
 
 
 # Check if the board is full
-def isGameOver(state):
-    global GAME_OVER
-    return GAME_OVER
+def isGameOver():
+    return interface.GAME_OVER
 
 
 # Fitness/Heuristic Function
