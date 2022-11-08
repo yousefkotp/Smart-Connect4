@@ -1,6 +1,6 @@
 import math
 import interface
-# 1:
+# 1: max, 0 min
 class Board:
     def __init__(self):
         self.state = 1 << 63
@@ -27,7 +27,6 @@ def convertToTwoDimensions(state):
     
     return True
 
-# VERY IMPORTANT!!! WE SHOULD MAKE SURE THAT WHEN THE CHILD IS 111 AKA MYNF3SH YA5OD AKTR
 def getChildren(next_color, state):
     print(decimalToBinary2(state))
     # printBinaryVal(state)
@@ -52,7 +51,7 @@ def miniMax(maxDepth, depth, isMaxPlayer, state):
     if depth == maxDepth or isGameOver(state):
         return (state, getValue(state))
 
-    children = getChildren(state)
+    children = getChildren(isMaxPlayer,state)
     BOARD.mapStates[state]=children
     if isMaxPlayer:
         maxChild = None
