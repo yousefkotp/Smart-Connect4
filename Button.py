@@ -1,8 +1,11 @@
 import pygame
 
+from connect4.interface import gradientRect
+
 
 class Button:
-    def __init__(self, screen, color, x, y, width, height, text=''):
+    def __init__(self, screen, color, x, y, width, height, text='', isChecked=False, gradCore=False, coreLeftColor=None,
+                 coreRightColor=None, gradOutline=False, outLeftColor=None, outRightColor=None):
         self.color = color
         self.x = x
         self.y = y
@@ -10,8 +13,15 @@ class Button:
         self.height = height
         self.text = text
         self.screen = screen
+        self.isChecked = isChecked
+        self.gradCore = gradCore
+        self.coreLeftColor = coreLeftColor
+        self.coreRightColor = coreRightColor
+        self.gradOutline = gradOutline
+        self.outLeftColor = outLeftColor
+        self.outRightColor = outRightColor
 
-    def draw(self, outline=None, font='comicsans', fontSize=15):
+    def draw(self, outline=None, outlineThickness=2, font='comicsans', fontSize=15, ):
         """
         Draws the button on screen
         :param outline: Outline color
@@ -19,8 +29,15 @@ class Button:
         :param fontSize: Font Size
         """
         if outline:
-            pygame.draw.rect(self.screen, outline, (self.x - 2, self.y - 2, self.width + 4, self.height + 4), 0)
-        button = pygame.draw.rect(self.screen, self.color, (self.x, self.y, self.width, self.height), 0)
+            rectOutline = pygame.draw.rect(self.screen, outline, (self.x, self.y,
+                                                                  self.width, self.height), 0)
+            if self.gradOutline:
+                gradientRect(self.screen, self.outLeftColor, self.outRightColor, rectOutline)
+        button = pygame.draw.rect(self.screen, self.color, (self.x + outlineThickness, self.y + outlineThickness,
+                                                            self.width - 2 * outlineThickness,
+                                                            self.height - 2 * outlineThickness), 0)
+        if self.gradCore:
+            gradientRect(self.screen, self.coreLeftColor, self.coreRightColor, button, self.text, font, fontSize)
 
         if self.text != '':
             font = pygame.font.SysFont(font, fontSize)
@@ -30,7 +47,7 @@ class Button:
 
         return self, button
 
-    def hover(self, pos):
+    def isOver(self, pos):
         # Pos is the mouse position or a tuple of (x,y) coordinates
         if self.x < pos[0] < self.x + self.width:
             if self.y < pos[1] < self.y + self.height:
