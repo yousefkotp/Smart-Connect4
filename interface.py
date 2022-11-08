@@ -24,6 +24,7 @@ DARKRED = (150, 0, 0)
 GREEN = (30, 230, 30)
 BLUE = (30, 30, 122)
 CYAN = (30, 230, 230)
+GOLD = (255, 215, 0)
 
 #   Component Colors   #
 BOARD_LAYOUT_BACKGROUND = DARKGREY
@@ -60,9 +61,10 @@ EMPTY_CELL = 0
 
 #   Game-Dependent Global Variables    #
 TURN = 1
-GAME_OVER = False
-player1score = player2score = 0
+GAME_OVER = True
+PLAYER_SCORE = [0, 0, 0]
 depth = 1
+board = [[]]
 
 
 def setupFrame():
@@ -80,13 +82,19 @@ def refreshFrame():
     """
     Refreshes the screen and all the components
     """
+    pygame.display.flip()
     refreshBackground()
     drawBoard()
     drawButtons()
     drawLabels()
     drawButtons()
-    refreshStats()
-    refreshScores()
+
+    if GAME_OVER:
+        drawPostGame()
+
+
+def drawPostGame():
+    pass
 
 
 def refreshBackground():
@@ -106,15 +114,28 @@ def drawLabels():
     mainLabel = titleFont.render("Smart Connect4", True, WHITE)
     screen.blit(mainLabel, (BOARD_LAYOUT_END_X + 20, 30))
 
-    captionFont = pygame.font.SysFont("Arial", 15)
-    player1ScoreCaption = captionFont.render("Player1", True, BLACK)
-    player2ScoreCaption = captionFont.render("Player2", True, BLACK)
-    screen.blit(player1ScoreCaption, (BOARD_LAYOUT_END_X + 48, 210))
-    screen.blit(player2ScoreCaption, (BOARD_LAYOUT_END_X + 170, 210))
+    if not GAME_OVER:
+        captionFont = pygame.font.SysFont("Arial", 15)
+        player1ScoreCaption = captionFont.render("Player1", True, BLACK)
+        player2ScoreCaption = captionFont.render("Player2", True, BLACK)
+        screen.blit(player1ScoreCaption, (BOARD_LAYOUT_END_X + 48, 210))
+        screen.blit(player2ScoreCaption, (BOARD_LAYOUT_END_X + 170, 210))
 
-    depthFont = pygame.font.SysFont("Serif", 23-len(str(depth)))
-    depthLabel = depthFont.render("k = " + str(depth), True, BLACK)
-    screen.blit(depthLabel, (WIDTH - 100, 294))
+        depthFont = pygame.font.SysFont("Serif", 23 - len(str(depth)))
+        depthLabel = depthFont.render("k = " + str(depth), True, BLACK)
+        screen.blit(depthLabel, (WIDTH - 100, 294))
+
+    else:
+        if PLAYER_SCORE[PLAYER1] == PLAYER_SCORE[PLAYER2]:
+            verdict = 'DRAW :)'
+        elif PLAYER_SCORE[PLAYER1] > PLAYER_SCORE[PLAYER2]:
+            verdict = 'Player 1 Wins!'
+        else:
+            verdict = 'Player 2 Wins!'
+
+        verdictFont = pygame.font.SysFont("Serif", 40)
+        verdictLabel = verdictFont.render(verdict, True, GOLD)
+        screen.blit(verdictLabel, (BOARD_BEGIN_X + BOARD_END_X / 3, BOARD_BEGIN_Y / 3))
 
     refreshScores()
     refreshStats()
@@ -124,28 +145,33 @@ def refreshScores():
     """
     Refreshes the scoreboard
     """
-    pygame.draw.rect(screen, BLACK, (BOARD_LAYOUT_END_X + 9, 119, 117, 82), 0)
-    player1ScoreSlot = pygame.draw.rect(screen, BOARD_LAYOUT_BACKGROUND,
-                                        (BOARD_LAYOUT_END_X + 10, 120, 115, 80))
+    if GAME_OVER:
+        scoreBoard_Y = BOARD_BEGIN_Y
+    else:
+        scoreBoard_Y = 120
 
-    pygame.draw.rect(screen, BLACK, (BOARD_LAYOUT_END_X + 134, 119, 117, 82), 0)
+    pygame.draw.rect(screen, BLACK, (BOARD_LAYOUT_END_X + 9, scoreBoard_Y - 1, 117, 82), 0)
+    player1ScoreSlot = pygame.draw.rect(screen, BOARD_LAYOUT_BACKGROUND,
+                                        (BOARD_LAYOUT_END_X + 10, scoreBoard_Y, 115, 80))
+
+    pygame.draw.rect(screen, BLACK, (BOARD_LAYOUT_END_X + 134, scoreBoard_Y - 1, 117, 82), 0)
     player2ScoreSlot = pygame.draw.rect(screen, BOARD_LAYOUT_BACKGROUND,
-                                        (BOARD_LAYOUT_END_X + 135, 120, 115, 80))
+                                        (BOARD_LAYOUT_END_X + 135, scoreBoard_Y, 115, 80))
 
     scoreFont = pygame.font.SysFont("Sans Serif", 80)
-    player1ScoreCounter = scoreFont.render(str(player1score), True, PIECE_COLORS[1])
-    player2ScoreCounter = scoreFont.render(str(player2score), True, PIECE_COLORS[2])
+    player1ScoreCounter = scoreFont.render(str(PLAYER_SCORE[PLAYER1]), True, PIECE_COLORS[1])
+    player2ScoreCounter = scoreFont.render(str(PLAYER_SCORE[PLAYER2]), True, PIECE_COLORS[2])
 
     player1ScoreLength = player2ScoreLength = 2.7
-    if player1score > 0:
-        player1ScoreLength += math.log(player1score, 10)
-    if player2score > 0:
-        player2ScoreLength += math.log(player2score, 10)
+    if PLAYER_SCORE[PLAYER1] > 0:
+        player1ScoreLength += math.log(PLAYER_SCORE[PLAYER1], 10)
+    if PLAYER_SCORE[PLAYER2] > 0:
+        player2ScoreLength += math.log(PLAYER_SCORE[PLAYER2], 10)
 
     screen.blit(player1ScoreCounter,
-                (player1ScoreSlot.x + player1ScoreSlot.width / player1ScoreLength, 135))
+                (player1ScoreSlot.x + player1ScoreSlot.width / player1ScoreLength, scoreBoard_Y + 15))
     screen.blit(player2ScoreCounter,
-                (player2ScoreSlot.x + player2ScoreSlot.width / player2ScoreLength, 135))
+                (player2ScoreSlot.x + player2ScoreSlot.width / player2ScoreLength, scoreBoard_Y + 15))
 
 
 def refreshStats():
@@ -162,24 +188,34 @@ def drawButtons():
     """
     Draws all buttons on the screen
     """
-    global showStatsButton, contributorsButton, modifyDepthButton
-    showStatsButton = btn.Button(
-        screen, color=LIGHTGREY,
-        x=BOARD_LAYOUT_END_X + 10, y=250,
-        width=WIDTH - BOARD_LAYOUT_END_X - 20, height=30, text="Show nerdy stats :D")
-    showStatsButton.draw(BLACK)
-
-    modifyDepthButton = btn.Button(
-        screen, color=LIGHTGREY,
-        x=BOARD_LAYOUT_END_X + 10, y=290,
-        width=WIDTH - BOARD_LAYOUT_END_X - 120, height=30, text="Modify depth k")
-    modifyDepthButton.draw(BLACK)
-
+    global showStatsButton, contributorsButton, modifyDepthButton, playAgainButton
     contributorsButton = btn.Button(
         screen, color=LIGHTGREY,
         x=BOARD_LAYOUT_END_X + 10, y=650,
         width=WIDTH - BOARD_LAYOUT_END_X - 20, height=30, text="Contributors")
     contributorsButton.draw(BLACK)
+
+    if not GAME_OVER:
+        modifyDepthButton = btn.Button(
+            screen, color=LIGHTGREY,
+            x=BOARD_LAYOUT_END_X + 10, y=290,
+            width=WIDTH - BOARD_LAYOUT_END_X - 120, height=30, text="Modify depth k")
+        modifyDepthButton.draw(BLACK)
+
+        showStatsButton_Y = 250
+    else:
+        showStatsButton_Y = 290
+
+        playAgainButton = btn.Button(
+            screen=screen, color=GOLD, x=BOARD_LAYOUT_END_X + 10, y=BOARD_BEGIN_Y + 100,
+            width=WIDTH - BOARD_LAYOUT_END_X - 20, height=80, text="Play Again")
+        playAgainButton.draw(BLACK)
+
+    showStatsButton = btn.Button(
+        screen, color=LIGHTGREY,
+        x=BOARD_LAYOUT_END_X + 10, y=showStatsButton_Y,
+        width=WIDTH - BOARD_LAYOUT_END_X - 20, height=30, text="Show nerdy stats :D")
+    showStatsButton.draw(BLACK)
 
 
 ######   Game Board  ######
@@ -248,6 +284,8 @@ def dropPiece(col, piece):
     row = getNextOpenRow(col)
     board[row][col] = piece
 
+    return (row, col)
+
 
 def hasEmptySlot(col):
     """
@@ -305,16 +343,15 @@ def switchTurn():
         TURN = 1
 
 
-def alterButtonAppearance(button, color, outline):
+def alterButtonAppearance(button, color, outline, hasGradBackground=False, gradLeftColor=None, gradRightColor=None):
     """
     Alter button appearance with given colors
-    :param button:
-    :param color:
-    :param outline:
-    :return:
+    :param hasGradBackground: Flag which indicates if the button background should be a gradient
     """
     button.color = color
-    button.draw(outline)
+    thisButton, buttonRect = button.draw(outline)
+    if hasGradBackground:
+        gradientRect(screen, gradLeftColor, gradRightColor, buttonRect, thisButton.text, 'comicsans', 20)
 
 
 def buttonResponseToMouseEvent(event):
@@ -329,23 +366,32 @@ def buttonResponseToMouseEvent(event):
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
             alterButtonAppearance(contributorsButton, WHITE, BLACK)
-        elif modifyDepthButton.hover(event.pos):
+        elif not GAME_OVER and modifyDepthButton.hover(event.pos):
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
             alterButtonAppearance(modifyDepthButton, WHITE, BLACK)
+        elif GAME_OVER and playAgainButton.hover(event.pos):
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+            alterButtonAppearance(playAgainButton, WHITE, BLACK, True, WHITE, GOLD)
         else:
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
             alterButtonAppearance(showStatsButton, LIGHTGREY, BLACK)
             alterButtonAppearance(contributorsButton, LIGHTGREY, BLACK)
-            alterButtonAppearance(modifyDepthButton, LIGHTGREY, BLACK)
+            if not GAME_OVER:
+                alterButtonAppearance(modifyDepthButton, LIGHTGREY, BLACK)
+            else:
+                alterButtonAppearance(playAgainButton, GOLD, BLACK)
 
     if event.type == pygame.MOUSEBUTTONDOWN:
         if showStatsButton.hover(event.pos):
             alterButtonAppearance(showStatsButton, CYAN, BLACK)
         elif contributorsButton.hover(event.pos):
             alterButtonAppearance(contributorsButton, CYAN, BLACK)
-        elif modifyDepthButton.hover(event.pos):
+        elif not GAME_OVER and modifyDepthButton.hover(event.pos):
             alterButtonAppearance(modifyDepthButton, CYAN, BLACK)
+        elif GAME_OVER and playAgainButton.hover(event.pos):
+            alterButtonAppearance(playAgainButton, GOLD, BLACK, True, GOLD, CYAN)
 
     if event.type == pygame.MOUSEBUTTONUP:
         if showStatsButton.hover(event.pos):
@@ -353,9 +399,13 @@ def buttonResponseToMouseEvent(event):
         elif contributorsButton.hover(event.pos):
             alterButtonAppearance(contributorsButton, LIGHTGREY, BLACK)
             showContributors()
-        elif modifyDepthButton.hover(event.pos):
+        elif not GAME_OVER and modifyDepthButton.hover(event.pos):
             alterButtonAppearance(modifyDepthButton, LIGHTGREY, BLACK)
             takeNewDepth()
+        elif GAME_OVER and playAgainButton.hover(event.pos):
+            alterButtonAppearance(playAgainButton, GOLD, BLACK, True, WHITE, GOLD)
+            resetEverything()
+
 
 
 def takeNewDepth():
@@ -383,8 +433,9 @@ def gameSession():
     Runs the game session
     """
     global GAME_OVER, TURN
-    while not GAME_OVER:
-        hoverPiece()
+    while True:
+        if not GAME_OVER:
+            hoverPiece()
         pygame.display.update()
 
         for event in pygame.event.get():
@@ -393,22 +444,34 @@ def gameSession():
 
             buttonResponseToMouseEvent(event)
 
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            if not GAME_OVER and event.type == pygame.MOUSEBUTTONDOWN:
                 posx = event.pos[0] - BOARD_BEGIN_X
                 column = getBoardColumnFromPos(posx)
 
                 if column is not None:
                     if hasEmptySlot(column):
-                        dropPiece(column, TURN)
+                        pieceLocation = dropPiece(column, TURN)
+                        PLAYER_SCORE[TURN] += sequencesFormed(pieceLocation, TURN)
                         switchTurn()
 
-                        printBoard()
-                        drawBoard()
+                        # printBoard()
+                        refreshFrame()
 
-                    GAME_OVER = boardIsFull()
+                    if boardIsFull():
+                        GAME_OVER = True
+                        pygame.mouse.set_visible(True)
+                        refreshFrame()
 
 
-def gradientRect(window, left_colour, right_colour, target_rect):
+def resetEverything():
+    global board, PLAYER_SCORE, GAME_OVER, TURN
+    PLAYER_SCORE = [0, 0, 0]
+    GAME_OVER = False
+    TURN = 1
+    setupFrame()
+
+
+def gradientRect(window, left_colour, right_colour, target_rect, text=None, font='comicsans', fontSize=15):
     """
     Draw a horizontal-gradient filled rectangle covering <target_rect>
     """
@@ -417,6 +480,59 @@ def gradientRect(window, left_colour, right_colour, target_rect):
     pygame.draw.line(colour_rect, right_colour, (1, 0), (1, 1))  # right colour line
     colour_rect = pygame.transform.smoothscale(colour_rect, (target_rect.width, target_rect.height))  # stretch!
     window.blit(colour_rect, target_rect)
+
+    if text:
+        font = pygame.font.SysFont(font, fontSize)
+        text = font.render(text, True, (0, 0, 0))
+        window.blit(text, (
+            target_rect.x + (target_rect.width / 2 - text.get_width() / 2),
+            target_rect.y + (target_rect.height / 2 - text.get_height() / 2)))
+
+
+def sequencesFormed(pieceLocation, piece):
+    r, c = pieceLocation[0], pieceLocation[1]
+    # Check horizontal locations for win
+    count = 0
+    if 0 <= c <= COLUMN_COUNT - 4:
+        if board[r][c] == piece and board[r][c + 1] == piece and board[r][c + 2] == piece and board[r][c + 3] == piece:
+            count += 1
+
+    # Check vertical locations for win
+    if 0 <= r <= ROW_COUNT - 4:
+        if board[r][c] == piece and board[r + 1][c] == piece and board[r + 2][c] == piece and board[r + 3][c] == piece:
+            count += 1
+
+    # Check -> diagonals
+    if 0 <= c <= COLUMN_COUNT - 4 and 0 <= r <= ROW_COUNT - 4:
+        if board[r][c] == piece and board[r + 1][c + 1] == piece \
+                and board[r + 2][c + 2] == piece and board[r + 3][c + 3] == piece:
+            count += 1
+    if 0 <= c <= COLUMN_COUNT - 4 and 3 <= r:
+        if board[r][c] == piece and board[r - 1][c + 1] == piece \
+                and board[r - 2][c + 2] == piece and board[r - 3][c + 3] == piece:
+            count += 1
+
+    # Check <- diagonals
+    if 3 <= c and 0 <= r <= ROW_COUNT - 4:
+        if board[r][c] == piece and board[r + 1][c - 1] == piece \
+                and board[r + 2][c - 2] == piece and board[r + 3][c - 3] == piece:
+            count += 1
+    if 3 <= c and 3 <= r:
+        if board[r][c] == piece and board[r - 1][c - 1] == piece \
+                and board[r - 2][c - 2] == piece and board[r - 3][c - 3] == piece:
+            count += 1
+
+    return count
+
+
+def isWithinBounds(mat, r, c):
+    """
+    :param mat: 2D matrix to check in
+    :param r: current row
+    :param c: current column
+    :return: True if within matrix bounds, False otherwise
+    """
+    return 0 <= r <= len(mat) and 0 <= c <= len(mat[0])
 
 
 if __name__ == '__main__':
