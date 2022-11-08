@@ -60,7 +60,7 @@ def convertToNumber(twoDimensionalState):
             if twoDimensionalState[i][j] == 1:
                 n = set_bit(n, startingBits[j] - i)
             elif twoDimensionalState[i][j]==-1:
-                n = ((7 << (k)) & n)
+                n = (((j+1) << (k)) & n)
         k-=9
     return n
 
