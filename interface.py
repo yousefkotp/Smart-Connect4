@@ -2,12 +2,14 @@ import math
 import sys
 import tkinter as tk
 from tkinter import messagebox, simpledialog
-
+import header
 import numpy as np
 import pygame
 win = tk.Tk();
 win.withdraw()
 #   Window Dimensions   #
+
+
 WIDTH = 1050
 HEIGHT = 700
 WINDOW_SIZE = (WIDTH, HEIGHT)
@@ -65,18 +67,21 @@ EMPTY_CELL = 0
 TURN = 1
 GAME_OVER = False
 PLAYER_SCORE = [0, 0, 0]
-depth = 1
-board = [[]]
+DEPTH = 1
+GAME_BOARD = [[]]
 usePruning = True
 
+
+def getDepth():
+    return DEPTH
 
 def setupFrame():
     """
     Initializes the all components in the frame
     """
-    global screen, board
+    global screen, GAME_BOARD
     screen = pygame.display.set_mode(WINDOW_SIZE)
-    board = createBoard(EMPTY_CELL)
+    GAME_BOARD = createBoard(EMPTY_CELL)
     pygame.display.set_caption('Smart Connect4 :)')
     refreshFrame()
 
@@ -116,8 +121,8 @@ def drawLabels():
         screen.blit(player1ScoreCaption, (BOARD_LAYOUT_END_X + 48, 210))
         screen.blit(player2ScoreCaption, (BOARD_LAYOUT_END_X + 170, 210))
 
-        depthFont = pygame.font.SysFont("Serif", 23 - len(str(depth)))
-        depthLabel = depthFont.render("k = " + str(depth), True, BLACK)
+        depthFont = pygame.font.SysFont("Serif", 23 - len(str(DEPTH)))
+        depthLabel = depthFont.render("k = " + str(DEPTH), True, BLACK)
         screen.blit(depthLabel, (WIDTH - 100, 294))
 
         depthFont = pygame.font.SysFont("Arial", 16)
@@ -208,7 +213,7 @@ def drawButtons():
             gradCore=usePruning, coreLeftColor=DARKGOLD, coreRightColor=GOLD,
             gradOutline=True, outLeftColor=LIGHTGREY, outRightColor=GREY)
 
-        pruningCheckbox.draw(WHITE, 4)
+        togglePruningCheckbox(toggle=False)
 
         showStatsButton_Y = 250
     else:
@@ -226,10 +231,15 @@ def drawButtons():
     showStatsButton.draw(BLACK)
 
 
-def togglePruningCheckbox():
+def togglePruningCheckbox(toggle=True):
     global usePruning, pruningCheckbox
-    usePruning = pruningCheckbox.isChecked = pruningCheckbox.gradCore = not usePruning
-    pruningCheckbox.draw(WHITE, 4)
+    if toggle:
+        usePruning = pruningCheckbox.isChecked = pruningCheckbox.gradCore = not usePruning
+
+    if usePruning:
+        pruningCheckbox.draw(WHITE, outlineThickness=4)
+    else:
+        pruningCheckbox.draw(WHITE, outlineThickness=2)
 
 
 ######   Game Board  ######
@@ -240,9 +250,9 @@ def createBoard(initialCellValue):
     :param initialCellValue: Value of initial cell value
     :return: board list with all cells initialized to initialCellValue
     """
-    global board
-    board = np.full((ROW_COUNT, COLUMN_COUNT), initialCellValue)
-    return board
+    global GAME_BOARD
+    GAME_BOARD = np.full((ROW_COUNT, COLUMN_COUNT), initialCellValue)
+    return GAME_BOARD
 
 
 def printBoard():
@@ -250,7 +260,7 @@ def printBoard():
     Prints the game board to the terminal
     """
     print('\n-\n' +
-          str(board) +
+          str(GAME_BOARD) +
           '\n Player ' + str(TURN) + ' plays next')
 
 
@@ -266,7 +276,7 @@ def drawBoard():
         for r in range(ROW_COUNT):
             col = BOARD_BEGIN_X + (c * SQUARE_SIZE)
             row = BOARD_BEGIN_Y + (r * SQUARE_SIZE)
-            piece = board[r][c]
+            piece = GAME_BOARD[r][c]
             pygame.draw.rect(
                 screen, CELL_BORDER_COLOR, (col, row, SQUARE_SIZE, SQUARE_SIZE))
             pygame.draw.circle(
@@ -297,7 +307,7 @@ def dropPiece(col, piece) -> tuple:
     :returns: tuple containing the row and column of piece position
     """
     row = getNextOpenRow(col)
-    board[row][col] = piece
+    GAME_BOARD[row][col] = piece
 
     return row, col
 
@@ -308,7 +318,7 @@ def hasEmptySlot(col) -> bool:
     :param col: Column index
     :return: True if column has an empty slot. False otherwise.
     """
-    return board[0][col] == EMPTY_CELL
+    return GAME_BOARD[0][col] == EMPTY_CELL
 
 
 def getNextOpenRow(col):
@@ -318,7 +328,7 @@ def getNextOpenRow(col):
     :return: If exists, the row of the first available empty slot in the column. None otherwise.
     """
     for r in range(ROW_COUNT - 1, -1, -1):
-        if board[r][col] == EMPTY_CELL:
+        if GAME_BOARD[r][col] == EMPTY_CELL:
             return r
     return None
 
@@ -330,7 +340,7 @@ def boardIsFull() -> bool:
     """
     for r in range(ROW_COUNT):
         for c in range(COLUMN_COUNT):
-            if board[r][c] == EMPTY_CELL:
+            if GAME_BOARD[r][c] == EMPTY_CELL:
                 return False
     return True
 
@@ -428,10 +438,10 @@ def takeNewDepth():
     """
     Invoked at pressing modify depth button. Displays a simple dialog that takes input depth from user
     """
-    global depth
+    global DEPTH
     temp = simpledialog.askinteger('Enter depth', 'Enter depth k')
     if temp is not None and temp > 0:
-        depth = temp
+        DEPTH = temp
     refreshFrame()
 
 
@@ -448,7 +458,7 @@ def gameSession():
     """
     Runs the game session
     """
-    global GAME_OVER, TURN
+    global GAME_OVER, TURN, GAME_BOARD
     while True:
         if not GAME_OVER:
             hoverPiece()
@@ -469,7 +479,6 @@ def gameSession():
                         pieceLocation = dropPiece(column, TURN)
                         PLAYER_SCORE[TURN] += sequencesFormed(pieceLocation, TURN)
                         switchTurn()
-
                         # printBoard()
                         refreshFrame()
 
@@ -478,13 +487,27 @@ def gameSession():
                         pygame.mouse.set_visible(True)
                         refreshFrame()
 
+                    # boardState = header.main.nextMove(usePruning, header.main.convertToNumber(GAME_BOARD))
+                    # newState = header.main.convertToTwoDimensions(boardState)
+                    # pieceLocation = getNewMove(newState, GAME_BOARD)
+                    # PLAYER_SCORE[TURN] += sequencesFormed(pieceLocation, TURN)
+                    # printBoard()
+                    # switchTurn()
+                    # refreshFrame()
+
 
 def resetEverything():
-    global board, PLAYER_SCORE, GAME_OVER, TURN
+    global GAME_BOARD, PLAYER_SCORE, GAME_OVER, TURN
     PLAYER_SCORE = [0, 0, 0]
     GAME_OVER = False
     TURN = 1
     setupFrame()
+
+def getNewMove(newState, oldState):
+    for r in range(ROW_COUNT):
+        for c in range(COLUMN_COUNT):
+            if newState[r][c] != oldState[r][c]:
+                return r, c
 
 
 def gradientRect(window, left_colour, right_colour, target_rect, text=None, font='comicsans', fontSize=15):
@@ -510,38 +533,38 @@ def sequencesFormed(pieceLocation, piece) -> int:
     # Check horizontal locations for win
     count = 0
     if 0 <= c <= COLUMN_COUNT - 4:
-        if board[r][c] == piece and board[r][c + 1] == piece and board[r][c + 2] == piece and board[r][c + 3] == piece:
+        if GAME_BOARD[r][c] == piece and GAME_BOARD[r][c + 1] == piece and GAME_BOARD[r][c + 2] == piece and GAME_BOARD[r][c + 3] == piece:
             count += 1
     if 3 <= c:
-        if board[r][c] == piece and board[r][c - 1] == piece and board[r][c - 2] == piece and board[r][c - 3] == piece:
+        if GAME_BOARD[r][c] == piece and GAME_BOARD[r][c - 1] == piece and GAME_BOARD[r][c - 2] == piece and GAME_BOARD[r][c - 3] == piece:
             count += 1
 
     # Check vertical locations for win
     if 0 <= r <= ROW_COUNT - 4:
-        if board[r][c] == piece and board[r + 1][c] == piece and board[r + 2][c] == piece and board[r + 3][c] == piece:
+        if GAME_BOARD[r][c] == piece and GAME_BOARD[r + 1][c] == piece and GAME_BOARD[r + 2][c] == piece and GAME_BOARD[r + 3][c] == piece:
             count += 1
     if 3 <= r:
-        if board[r][c] == piece and board[r - 1][c] == piece and board[r - 2][c] == piece and board[r - 3][c] == piece:
+        if GAME_BOARD[r][c] == piece and GAME_BOARD[r - 1][c] == piece and GAME_BOARD[r - 2][c] == piece and GAME_BOARD[r - 3][c] == piece:
             count += 1
 
     # Check -> diagonals
     if 0 <= c <= COLUMN_COUNT - 4 and 0 <= r <= ROW_COUNT - 4:
-        if board[r][c] == piece and board[r + 1][c + 1] == piece \
-                and board[r + 2][c + 2] == piece and board[r + 3][c + 3] == piece:
+        if GAME_BOARD[r][c] == piece and GAME_BOARD[r + 1][c + 1] == piece \
+                and GAME_BOARD[r + 2][c + 2] == piece and GAME_BOARD[r + 3][c + 3] == piece:
             count += 1
     if 0 <= c <= COLUMN_COUNT - 4 and 3 <= r:
-        if board[r][c] == piece and board[r - 1][c + 1] == piece \
-                and board[r - 2][c + 2] == piece and board[r - 3][c + 3] == piece:
+        if GAME_BOARD[r][c] == piece and GAME_BOARD[r - 1][c + 1] == piece \
+                and GAME_BOARD[r - 2][c + 2] == piece and GAME_BOARD[r - 3][c + 3] == piece:
             count += 1
 
     # Check <- diagonals
     if 3 <= c and 0 <= r <= ROW_COUNT - 4:
-        if board[r][c] == piece and board[r + 1][c - 1] == piece \
-                and board[r + 2][c - 2] == piece and board[r + 3][c - 3] == piece:
+        if GAME_BOARD[r][c] == piece and GAME_BOARD[r + 1][c - 1] == piece \
+                and GAME_BOARD[r + 2][c - 2] == piece and GAME_BOARD[r + 3][c - 3] == piece:
             count += 1
     if 3 <= c and 3 <= r:
-        if board[r][c] == piece and board[r - 1][c - 1] == piece \
-                and board[r - 2][c - 2] == piece and board[r - 3][c - 3] == piece:
+        if GAME_BOARD[r][c] == piece and GAME_BOARD[r - 1][c - 1] == piece \
+                and GAME_BOARD[r - 2][c - 2] == piece and GAME_BOARD[r - 3][c - 3] == piece:
             count += 1
 
     return count

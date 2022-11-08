@@ -1,12 +1,13 @@
 import math
-import interface
-
+import header
 
 # 1: max, 0 min
+
+
 class Board:
     def __init__(self):
         self.state = 1 << 63
-        self.maxDepth = interface.depth
+        self.maxDepth = header.interface.DEPTH
         self.mapStates = {}
 
 
