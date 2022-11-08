@@ -5,7 +5,6 @@ from tkinter import messagebox, simpledialog
 import numpy as np
 import pygame
 
-
 #   Window Dimensions   #
 WIDTH = 1050
 HEIGHT = 700
@@ -511,10 +510,16 @@ def sequencesFormed(pieceLocation, piece) -> int:
     if 0 <= c <= COLUMN_COUNT - 4:
         if board[r][c] == piece and board[r][c + 1] == piece and board[r][c + 2] == piece and board[r][c + 3] == piece:
             count += 1
+    if 3 <= c:
+        if board[r][c] == piece and board[r][c - 1] == piece and board[r][c - 2] == piece and board[r][c - 3] == piece:
+            count += 1
 
     # Check vertical locations for win
     if 0 <= r <= ROW_COUNT - 4:
         if board[r][c] == piece and board[r + 1][c] == piece and board[r + 2][c] == piece and board[r + 3][c] == piece:
+            count += 1
+    if 3 <= r:
+        if board[r][c] == piece and board[r - 1][c] == piece and board[r - 2][c] == piece and board[r - 3][c] == piece:
             count += 1
 
     # Check -> diagonals
@@ -548,6 +553,7 @@ def isWithinBounds(mat, r, c) -> bool:
     :return: True if coordinates are within matrix bounds, False otherwise
     """
     return 0 <= r <= len(mat) and 0 <= c <= len(mat[0])
+
 
 class Button:
     def __init__(self, screen, color, x, y, width, height, text='', isChecked=False, gradCore=False, coreLeftColor=None,
@@ -600,6 +606,7 @@ class Button:
                 return True
 
         return False
+
 
 if __name__ == '__main__':
     pygame.init()
