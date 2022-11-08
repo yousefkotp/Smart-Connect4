@@ -132,7 +132,7 @@ def miniMaxAlphaBeta(maxDepth, depth, isMaxPlayer, state, alpha, beta):
         maxValue = -math.inf
         children = getChildren(isMaxPlayer, state)
         for child in children:
-            childValue = miniMax(maxDepth, depth + 1, not isMaxPlayer, child)[1]
+            childValue = miniMaxAlphaBeta(maxDepth, depth + 1, not isMaxPlayer, child, alpha, beta)[1]
             if childValue > maxValue:
                 maxChild = child
                 maxValue = childValue
@@ -146,7 +146,7 @@ def miniMaxAlphaBeta(maxDepth, depth, isMaxPlayer, state, alpha, beta):
         minValue = math.inf
         children = getChildren(isMaxPlayer, state)
         for child in children:
-            childValue = miniMax(maxDepth, depth + 1, not isMaxPlayer, child)[1]
+            childValue = miniMaxAlphaBeta(maxDepth, depth + 1, not isMaxPlayer, child, alpha, beta)[1]
             if childValue > minValue:
                 minValue = childValue
                 minChild = child
