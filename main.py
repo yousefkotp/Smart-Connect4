@@ -38,6 +38,16 @@ def convertToTwoDimensions(state):
 
 print(convertToTwoDimensions(18067701387263464938))
 
+def convertToNumber(twoDimensionalState):
+
+    n = 17309616014371291584     # Equivalent to 111000000 for all columns
+    startingBits = [59, 50, 41, 32, 23, 14, 5]
+    for j in range(0,7):
+        for i in range(0, 6):
+            if twoDimensionalState[i][j]==1:
+                set_bit(n,startingBits[j]-i)
+    return n
+
 
 # max =1
 # min =0
