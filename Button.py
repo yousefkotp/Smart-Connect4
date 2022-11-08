@@ -1,6 +1,6 @@
 import pygame
 
-from interface import gradientRect
+from connect4.interface import gradientRect
 
 
 class Button:

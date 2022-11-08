@@ -289,11 +289,12 @@ def hoverPiece():
         pygame.mouse.set_visible(True)
 
 
-def dropPiece(col, piece):
+def dropPiece(col, piece) -> tuple:
     """
     Drops the given piece in the next available slot in col
     :param col: Column index where the piece will be dropped
     :param piece: Value of the piece to be put in array.
+    :returns: tuple containing the row and column of piece position
     """
     row = getNextOpenRow(col)
     board[row][col] = piece
@@ -301,7 +302,7 @@ def dropPiece(col, piece):
     return row, col
 
 
-def hasEmptySlot(col):
+def hasEmptySlot(col) -> bool:
     """
     Checks if current column has an empty slot. Assumes col is within array limits
     :param col: Column index
@@ -322,7 +323,7 @@ def getNextOpenRow(col):
     return None
 
 
-def boardIsFull():
+def boardIsFull() -> bool:
     """
     Checks if the board game is full
     :return: True if the board list has no empty slots, False otherwise.
@@ -504,7 +505,7 @@ def gradientRect(window, left_colour, right_colour, target_rect, text=None, font
             target_rect.y + (target_rect.height / 2 - text.get_height() / 2)))
 
 
-def sequencesFormed(pieceLocation, piece):
+def sequencesFormed(pieceLocation, piece) -> int:
     r, c = pieceLocation[0], pieceLocation[1]
     # Check horizontal locations for win
     count = 0
@@ -540,12 +541,12 @@ def sequencesFormed(pieceLocation, piece):
     return count
 
 
-def isWithinBounds(mat, r, c):
+def isWithinBounds(mat, r, c) -> bool:
     """
     :param mat: 2D matrix to check in
     :param r: current row
     :param c: current column
-    :return: True if within matrix bounds, False otherwise
+    :return: True if coordinates are within matrix bounds, False otherwise
     """
     return 0 <= r <= len(mat) and 0 <= c <= len(mat[0])
 
