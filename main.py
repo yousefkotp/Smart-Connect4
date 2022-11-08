@@ -24,6 +24,9 @@ BOARD = Board()
 def decimalToBinary2(n):
     return "{0:b}".format(int(n))
 
+def convertToTwoDimensions(state):
+    
+    return True
 
 # VERY IMPORTANT!!! WE SHOULD MAKE SURE THAT WHEN THE CHILD IS 111 AKA MYNF3SH YA5OD AKTR
 def getChildren(next_color, state):
