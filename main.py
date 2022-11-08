@@ -1,7 +1,113 @@
+import math
+
+maxDepth = 10
+"""
+1- Good heuristic function aka make the function a linear weighted sum of the features
+2- Transpositional Table
+3- Save moves for early game -> first 6 turns
+4- use multi-processing if we can
+5- Enhance the exploring order by exploring best moves first aka moves which places new item near to existing one
+"""
+
+def decimalToBinary2(n):
+    return "{0:b}".format(int(n))
 
 
-#1100
-#k-1
+def getChildren(next_color, state):
+    print(decimalToBinary2(state))
+    # printBinaryVal(state)
+    k = 60
+    arr = []
+    for i in range(0, 7):
+        temp = ((7 << (k)) & state) >> (k)
+        # print(temp)
+        state = state | (1 << (k - temp))
+        print(decimalToBinary2(state))
+        k -= 9
+    return arr
+
+
+def nextMove(alphaBetaPruning, state):
+    global maxDepth
+    if alphaBetaPruning:
+        return miniMaxAlphaBeta(maxDepth, 0, 1, state, -math.inf, math.inf)[0]
+    return miniMax(maxDepth, 0, 1, state)[0]
+
+
+def miniMax(maxDepth, depth, isMaxPlayer, state):
+    if depth == maxDepth or isGameOver(state):
+        return (state, getValue(state))
+
+    if isMaxPlayer:
+        maxChild = None
+        maxValue = -math.inf
+        children = getChildren(state)
+        for child in children:
+            childValue = miniMax(maxDepth, depth + 1, not isMaxPlayer, child)[1]
+            if childValue > maxValue:
+                maxChild = child
+                maxValue = childValue
+        return (maxChild, maxValue)
+    else:
+        minChild = None
+        minValue = math.inf
+        children = getChildren(state)
+        for child in children:
+            childValue = miniMax(maxDepth, depth + 1, not isMaxPlayer, child)[1]
+            if childValue > minValue:
+                minValue = childValue
+                minChild = child
+        return (minChild, minValue)
+
+
+
+
+
+def miniMaxAlphaBeta(maxDepth, depth, isMaxPlayer, state, alpha, beta):
+    if depth == maxDepth or isGameOver(state):
+        return (state, getValue(state))
+
+    if isMaxPlayer:
+        maxChild = None
+        maxValue = -math.inf
+        children = getChildren(state)
+        for child in children:
+            childValue = miniMax(maxDepth, depth + 1, not isMaxPlayer, child)[1]
+            if childValue > maxValue:
+                maxChild = child
+                maxValue = childValue
+            if maxValue >= beta:
+                break
+            if maxValue > alpha:
+                alpha = maxValue
+        return (maxChild, maxValue)
+    else:
+        minChild = None
+        minValue = math.inf
+        children = getChildren(state)
+        for child in children:
+            childValue = miniMax(maxDepth, depth + 1, not isMaxPlayer, child)[1]
+            if childValue > minValue:
+                minValue = childValue
+                minChild = child
+            if minValue <= alpha:
+                break
+            if minValue < beta:
+                beta = minValue
+        return (minChild, minValue)
+
+
+# Check if the board is full
+def isGameOver(state):
+    return False
+
+# Fitness/Heuristic Function
+def getValue(state):
+    return True
+
+
+# 1100
+# k-1
 # print(1<<2&12)
 # # 1 010100000 010100000 010100000 010100000 010100000 010100000 010100000 
 
@@ -13,8 +119,8 @@
 # # awl makan
 # print(1<<63 & x)
 # print(1<<(54) & x)
-#awl  makan k=63 62 61    (60,59,58,57,56,55)
-#tany makan k=54 53 52    (56,56,56,56,56,56)
+# awl  makan k=63 62 61    (60,59,58,57,56,55)
+# tany makan k=54 53 52    (56,56,56,56,56,56)
 # tany
 # string=""
 # def DecimalToBinary(num):
@@ -22,7 +128,7 @@
 #         if num >= 1:
 #             DecimalToBinary(num // 2)
 #             string+=str( (num % 2) )
-        
+
 # def printBinaryVal(num):
 #     global string    
 #     DecimalToBinary(num)
@@ -30,36 +136,18 @@
 #     string=""
 #     return
 
-def decimalToBinary2(n):
-    return "{0:b}".format(int(n))
-
-
-def getChildren(next_color,state):
-    print(decimalToBinary2(state))
-    # printBinaryVal(state)
-    k=62
-    arr=[]
-    for i in range(0,7):
-        temp=((7<<(k-2))&state)>>(k-2)
-        # print(temp)
-        state=state| (1<<(k-temp-2))
-        print(decimalToBinary2(state))
-        k-=9
-    return arr
 
 # print("-----------")
 # for i in range(0,9):
 #     print(i)
 
-#kosom el byson
-getChildren(1,int("1010100000010100000010100000010100000010100000010100000010100000",2))
+# kosom el byson
+getChildren(1, int("1010100000010100000010100000010100000010100000010100000010100000", 2))
 # print((int("1010100000010100000010100000010100000010100000010100000010100000",2)))
-#print(bin(1010100000010100000010100000010100000010100000010100000010100000))
+# print(bin(1010100000010100000010100000010100000010100000010100000010100000))
 # print(intoBinary(int("1010100000010100000010100000010100000010100000010100000010100000",2)))
 # DecimalToBinary(int("1010100000010100000010100000010100000010100000010100000010100000",2))
 # print(string)
-
-
 
 
 # ---------------------------------------------------------------------
@@ -92,7 +180,6 @@ getChildren(1,int("1010100000010100000010100000010100000010100000010100000010100
 #         #      next_zero_binary+="1"
 #         # else:
 #         #      next_zero_binary+="0"      
-
 
 
 #         # arr.append(next_zero_binary)
