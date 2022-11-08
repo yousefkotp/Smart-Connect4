@@ -1,11 +1,13 @@
 import math
 import interface
+
+
 # 1: max, 0 min
 class Board:
     def __init__(self):
         self.state = 1 << 63
         self.maxDepth = interface.depth
-        self.mapStates={}
+        self.mapStates = {}
 
 
 BOARD = Board()
@@ -18,71 +20,75 @@ BOARD = Board()
 5- Enhance the exploring order by exploring best moves first aka moves which places new item near to existing one
 """
 
+
 def decimalToBinary2(n):
     return "{0:b}".format(int(n))
+
 
 def convertToTwoDimensions(state):
     twoDimensionalArray = []
 
-    for i in range(0,6):
+    for i in range(0, 6):
         twoDimensionalArray.insert(i, [-1, -1, -1, -1, -1, -1, -1])
     k = 60
     startingBits = [59, 50, 41, 32, 23, 14, 5]
     for j in range(0, 7):
-        lastLocation = (((7<<k) & state) >>k )-1
-        k-=9
-        for row in range(0,lastLocation):
-            currentBit = ((1<<(startingBits[j]-row))&state)>>(startingBits[j]-row)
+        lastLocation = (((7 << k) & state) >> k) - 1
+        k -= 9
+        for row in range(0, lastLocation):
+            currentBit = ((1 << (startingBits[j] - row)) & state) >> (startingBits[j] - row)
             twoDimensionalArray[row][j] = currentBit
     return twoDimensionalArray
 
+
 print(convertToTwoDimensions(18067701387263464938))
 
-def convertToNumber(twoDimensionalState):
 
-    n = 17309616014371291584     # Equivalent to 111000000 for all columns
+def convertToNumber(twoDimensionalState):
+    n = 17309616014371291584  # Equivalent to 111000000 for all columns
     startingBits = [59, 50, 41, 32, 23, 14, 5]
-    for j in range(0,7):
+    for j in range(0, 7):
         for i in range(0, 6):
-            if twoDimensionalState[i][j]==1:
-                set_bit(n,startingBits[j]-i)
+            if twoDimensionalState[i][j] == 1:
+                set_bit(n, startingBits[j] - i)
     return n
 
 
 # max =1
 # min =0
 def set_bit(value, bit):
-    return value | (1<<bit)
+    return value | (1 << bit)
+
 
 def clear_bit(value, bit):
-    return value & ~(1<<bit)
+    return value & ~(1 << bit)
+
 
 def getChildren(player, state):
     print(decimalToBinary2(state))
     k = 60
     children = []
     for i in range(0, 7):
-        temp_state=state
+        temp_state = state
         temp = ((7 << (k)) & temp_state) >> (k)
         if player == 1 and temp != 7:
             temp_state = state | (1 << (k - temp))
-            temp_state= clear_bit(temp_state,k)
-            temp_state= clear_bit(temp_state,k+1)
-            temp_state= clear_bit(temp_state,k+2)
-            temp_state = temp_state | ((temp + 1)<<k)
-            print(decimalToBinary2(temp_state))
-            children.append(temp_state)
-        elif player == 0 and temp !=7:
-            temp_state = clear_bit(temp_state,k-temp)
             temp_state = clear_bit(temp_state, k)
             temp_state = clear_bit(temp_state, k + 1)
             temp_state = clear_bit(temp_state, k + 2)
-            temp_state = temp_state | ((temp + 1)<<k)
+            temp_state = temp_state | ((temp + 1) << k)
+            print(decimalToBinary2(temp_state))
+            children.append(temp_state)
+        elif player == 0 and temp != 7:
+            temp_state = clear_bit(temp_state, k - temp)
+            temp_state = clear_bit(temp_state, k)
+            temp_state = clear_bit(temp_state, k + 1)
+            temp_state = clear_bit(temp_state, k + 2)
+            temp_state = temp_state | ((temp + 1) << k)
             children.append(temp_state)
             print(decimalToBinary2(temp_state))
-        k-=9
+        k -= 9
     return children
-
 
 
 def nextMove(alphaBetaPruning, state):
@@ -95,8 +101,8 @@ def miniMax(maxDepth, depth, isMaxPlayer, state):
     if depth == maxDepth or isGameOver(state):
         return (state, getValue(state))
 
-    children = getChildren(isMaxPlayer,state)
-    BOARD.mapStates[state]=children
+    children = getChildren(isMaxPlayer, state)
+    BOARD.mapStates[state] = children
     if isMaxPlayer:
         maxChild = None
         maxValue = -math.inf
@@ -124,7 +130,7 @@ def miniMaxAlphaBeta(maxDepth, depth, isMaxPlayer, state, alpha, beta):
     if isMaxPlayer:
         maxChild = None
         maxValue = -math.inf
-        children = getChildren(state)
+        children = getChildren(isMaxPlayer, state)
         for child in children:
             childValue = miniMax(maxDepth, depth + 1, not isMaxPlayer, child)[1]
             if childValue > maxValue:
@@ -138,7 +144,7 @@ def miniMaxAlphaBeta(maxDepth, depth, isMaxPlayer, state, alpha, beta):
     else:
         minChild = None
         minValue = math.inf
-        children = getChildren(state)
+        children = getChildren(isMaxPlayer, state)
         for child in children:
             childValue = miniMax(maxDepth, depth + 1, not isMaxPlayer, child)[1]
             if childValue > minValue:
