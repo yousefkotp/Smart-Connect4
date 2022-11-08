@@ -22,7 +22,7 @@ def decimalToBinary2(n):
     return "{0:b}".format(int(n))
 
 def convertToTwoDimensions(state):
-    twoDimensionalArray = [[]]
+    twoDimensionalArray = []
 
     for i in range(0,6):
         twoDimensionalArray.insert(i, [-1, -1, -1, -1, -1, -1, -1])
@@ -34,8 +34,6 @@ def convertToTwoDimensions(state):
         for row in range(0,lastLocation):
             currentBit = ((1<<(startingBits[j]-row))&state)>>(startingBits[j]-row)
             twoDimensionalArray[row][j] = currentBit
-
-
     return twoDimensionalArray
 
 print(convertToTwoDimensions(18067701387263464938))
@@ -143,9 +141,15 @@ def miniMaxAlphaBeta(maxDepth, depth, isMaxPlayer, state, alpha, beta):
         return (minChild, minValue)
 
 
-# Check if the board is full
+# Check if the state makes the board full
 def isGameOver(state):
-    return False
+    k = 60
+    for j in range(0, 7):
+        maxLocation = (((7 << k) & state) >> k)
+        if maxLocation != 7:
+            return False
+        k -= 9
+    return True
 
 
 # Fitness/Heuristic Function
