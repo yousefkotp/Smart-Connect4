@@ -1,10 +1,12 @@
 import math
 import sys
+import tkinter as tk
 from tkinter import messagebox, simpledialog
 
 import numpy as np
 import pygame
-
+win = tk.Tk();
+win.withdraw()
 #   Window Dimensions   #
 WIDTH = 1050
 HEIGHT = 700
