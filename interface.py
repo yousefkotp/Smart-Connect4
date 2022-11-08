@@ -90,14 +90,6 @@ def refreshFrame():
     drawBoard()
     drawButtons()
     drawLabels()
-    drawButtons()
-
-    if GAME_OVER:
-        drawPostGame()
-
-
-def drawPostGame():
-    pass
 
 
 def refreshBackground():
@@ -225,6 +217,7 @@ def drawButtons():
         playAgainButton = btn.Button(
             screen=screen, color=GOLD, x=BOARD_LAYOUT_END_X + 10, y=BOARD_BEGIN_Y + 100,
             width=WIDTH - BOARD_LAYOUT_END_X - 20, height=120, text="Play Again")
+        playAgainButton.draw()
 
     showStatsButton = btn.Button(
         screen, color=LIGHTGREY,
@@ -235,11 +228,7 @@ def drawButtons():
 
 def togglePruningCheckbox():
     global usePruning, pruningCheckbox
-    usePruning = not usePruning
-    if usePruning:
-        pruningCheckbox.gradCore = True
-    else:
-        pruningCheckbox.gradCore = False
+    usePruning = pruningCheckbox.isChecked = pruningCheckbox.gradCore = not usePruning
     pruningCheckbox.draw(WHITE, 4)
 
 
