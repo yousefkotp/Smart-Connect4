@@ -22,9 +22,11 @@ BLACK = (0, 0, 0)
 RED = (230, 30, 30)
 DARKRED = (150, 0, 0)
 GREEN = (30, 230, 30)
+DARKGREEN = (0, 190, 0)
 BLUE = (30, 30, 122)
 CYAN = (30, 230, 230)
-GOLD = (255, 215, 0)
+GOLD = (225, 185, 0)
+DARKGOLD = (165, 125, 0)
 
 #   Component Colors   #
 BOARD_LAYOUT_BACKGROUND = DARKGREY
@@ -65,6 +67,7 @@ GAME_OVER = False
 PLAYER_SCORE = [0, 0, 0]
 depth = 1
 board = [[]]
+usePruning = True
 
 
 def setupFrame():
@@ -125,6 +128,10 @@ def drawLabels():
         depthLabel = depthFont.render("k = " + str(depth), True, BLACK)
         screen.blit(depthLabel, (WIDTH - 100, 294))
 
+        depthFont = pygame.font.SysFont("Arial", 16)
+        depthLabel = depthFont.render("Use alpha-beta pruning", True, BLACK)
+        screen.blit(depthLabel, (BOARD_LAYOUT_END_X + 65, 340))
+
     else:
         if PLAYER_SCORE[PLAYER1] == PLAYER_SCORE[PLAYER2]:
             verdict = 'DRAW :)'
@@ -178,8 +185,8 @@ def refreshStats():
     """
     Refreshes the analysis section
     """
-    pygame.draw.rect(screen, BLACK, (BOARD_LAYOUT_END_X + 9, 329, WIDTH - BOARD_LAYOUT_END_X - 18, 307), 0)
-    pygame.draw.rect(screen, GREY, (BOARD_LAYOUT_END_X + 10, 330, WIDTH - BOARD_LAYOUT_END_X - 20, 305))
+    pygame.draw.rect(screen, BLACK, (BOARD_LAYOUT_END_X + 9, 369, WIDTH - BOARD_LAYOUT_END_X - 18, 267), 0)
+    pygame.draw.rect(screen, GREY, (BOARD_LAYOUT_END_X + 10, 370, WIDTH - BOARD_LAYOUT_END_X - 20, 265))
 
 
 ######   Buttons    ######
@@ -188,7 +195,7 @@ def drawButtons():
     """
     Draws all buttons on the screen
     """
-    global showStatsButton, contributorsButton, modifyDepthButton, playAgainButton
+    global showStatsButton, contributorsButton, modifyDepthButton, playAgainButton, pruningCheckbox
     contributorsButton = btn.Button(
         screen, color=LIGHTGREY,
         x=BOARD_LAYOUT_END_X + 10, y=650,
@@ -202,20 +209,38 @@ def drawButtons():
             width=WIDTH - BOARD_LAYOUT_END_X - 120, height=30, text="Modify depth k")
         modifyDepthButton.draw(BLACK)
 
+        pruningCheckbox = btn.Button(
+            screen, color=WHITE,
+            x=BOARD_LAYOUT_END_X + 35, y=340,
+            width=20, height=20, text="",
+            gradCore=usePruning, coreLeftColor=DARKGOLD, coreRightColor=GOLD,
+            gradOutline=True, outLeftColor=LIGHTGREY, outRightColor=GREY)
+
+        pruningCheckbox.draw(WHITE, 4)
+
         showStatsButton_Y = 250
     else:
-        showStatsButton_Y = 290
+        showStatsButton_Y = 330
 
         playAgainButton = btn.Button(
             screen=screen, color=GOLD, x=BOARD_LAYOUT_END_X + 10, y=BOARD_BEGIN_Y + 100,
-            width=WIDTH - BOARD_LAYOUT_END_X - 20, height=80, text="Play Again")
-        playAgainButton.draw(BLACK)
+            width=WIDTH - BOARD_LAYOUT_END_X - 20, height=120, text="Play Again")
 
     showStatsButton = btn.Button(
         screen, color=LIGHTGREY,
         x=BOARD_LAYOUT_END_X + 10, y=showStatsButton_Y,
         width=WIDTH - BOARD_LAYOUT_END_X - 20, height=30, text="Show nerdy stats :D")
     showStatsButton.draw(BLACK)
+
+
+def togglePruningCheckbox():
+    global usePruning, pruningCheckbox
+    usePruning = not usePruning
+    if usePruning:
+        pruningCheckbox.gradCore = True
+    else:
+        pruningCheckbox.gradCore = False
+    pruningCheckbox.draw(WHITE, 4)
 
 
 ######   Game Board  ######
@@ -284,7 +309,7 @@ def dropPiece(col, piece):
     row = getNextOpenRow(col)
     board[row][col] = piece
 
-    return (row, col)
+    return row, col
 
 
 def hasEmptySlot(col):
@@ -343,7 +368,8 @@ def switchTurn():
         TURN = 1
 
 
-def alterButtonAppearance(button, color, outline, hasGradBackground=False, gradLeftColor=None, gradRightColor=None):
+def alterButtonAppearance(button, color, outline,
+                          hasGradBackground=False, gradLeftColor=None, gradRightColor=None, fontSize=15):
     """
     Alter button appearance with given colors
     :param hasGradBackground: Flag which indicates if the button background should be a gradient
@@ -351,7 +377,7 @@ def alterButtonAppearance(button, color, outline, hasGradBackground=False, gradL
     button.color = color
     thisButton, buttonRect = button.draw(outline)
     if hasGradBackground:
-        gradientRect(screen, gradLeftColor, gradRightColor, buttonRect, thisButton.text, 'comicsans', 20)
+        gradientRect(screen, gradLeftColor, gradRightColor, buttonRect, thisButton.text, 'comicsans', fontSize)
 
 
 def buttonResponseToMouseEvent(event):
@@ -359,21 +385,20 @@ def buttonResponseToMouseEvent(event):
     Handles button behaviour in response to mouse events influencing them
     """
     if event.type == pygame.MOUSEMOTION:
-        if showStatsButton.hover(event.pos):
+        if showStatsButton.isOver(event.pos):
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
             alterButtonAppearance(showStatsButton, WHITE, BLACK)
-        elif contributorsButton.hover(event.pos):
-            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+        elif contributorsButton.isOver(event.pos):
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
             alterButtonAppearance(contributorsButton, WHITE, BLACK)
-        elif not GAME_OVER and modifyDepthButton.hover(event.pos):
-            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+        elif not GAME_OVER and modifyDepthButton.isOver(event.pos):
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
             alterButtonAppearance(modifyDepthButton, WHITE, BLACK)
-        elif GAME_OVER and playAgainButton.hover(event.pos):
+        elif not GAME_OVER and pruningCheckbox.isOver(event.pos):
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+        elif GAME_OVER and playAgainButton.isOver(event.pos):
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
-            alterButtonAppearance(playAgainButton, WHITE, BLACK, True, WHITE, GOLD)
+            alterButtonAppearance(playAgainButton, WHITE, BLACK, True, WHITE, GOLD, 22)
         else:
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
             alterButtonAppearance(showStatsButton, LIGHTGREY, BLACK)
@@ -384,28 +409,29 @@ def buttonResponseToMouseEvent(event):
                 alterButtonAppearance(playAgainButton, GOLD, BLACK)
 
     if event.type == pygame.MOUSEBUTTONDOWN:
-        if showStatsButton.hover(event.pos):
+        if showStatsButton.isOver(event.pos):
             alterButtonAppearance(showStatsButton, CYAN, BLACK)
-        elif contributorsButton.hover(event.pos):
+        elif contributorsButton.isOver(event.pos):
             alterButtonAppearance(contributorsButton, CYAN, BLACK)
-        elif not GAME_OVER and modifyDepthButton.hover(event.pos):
+        elif not GAME_OVER and modifyDepthButton.isOver(event.pos):
             alterButtonAppearance(modifyDepthButton, CYAN, BLACK)
-        elif GAME_OVER and playAgainButton.hover(event.pos):
+        elif not GAME_OVER and pruningCheckbox.isOver(event.pos):
+            togglePruningCheckbox()
+        elif GAME_OVER and playAgainButton.isOver(event.pos):
             alterButtonAppearance(playAgainButton, GOLD, BLACK, True, GOLD, CYAN)
 
     if event.type == pygame.MOUSEBUTTONUP:
-        if showStatsButton.hover(event.pos):
+        if showStatsButton.isOver(event.pos):
             alterButtonAppearance(showStatsButton, LIGHTGREY, BLACK)
-        elif contributorsButton.hover(event.pos):
+        elif contributorsButton.isOver(event.pos):
             alterButtonAppearance(contributorsButton, LIGHTGREY, BLACK)
             showContributors()
-        elif not GAME_OVER and modifyDepthButton.hover(event.pos):
+        elif not GAME_OVER and modifyDepthButton.isOver(event.pos):
             alterButtonAppearance(modifyDepthButton, LIGHTGREY, BLACK)
             takeNewDepth()
-        elif GAME_OVER and playAgainButton.hover(event.pos):
+        elif GAME_OVER and playAgainButton.isOver(event.pos):
             alterButtonAppearance(playAgainButton, GOLD, BLACK, True, WHITE, GOLD)
             resetEverything()
-
 
 
 def takeNewDepth():
