@@ -61,7 +61,7 @@ EMPTY_CELL = 0
 
 #   Game-Dependent Global Variables    #
 TURN = 1
-GAME_OVER = True
+GAME_OVER = False
 PLAYER_SCORE = [0, 0, 0]
 depth = 1
 board = [[]]

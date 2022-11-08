@@ -1,6 +1,8 @@
 import math
-
+import interface
 maxDepth = 10
+BOARD = 1<<63
+GAME_OVER = interface.GAME_OVER
 """
 1- Good heuristic function aka make the function a linear weighted sum of the features
 2- Transpositional Table
@@ -9,10 +11,12 @@ maxDepth = 10
 5- Enhance the exploring order by exploring best moves first aka moves which places new item near to existing one
 """
 
+
 def decimalToBinary2(n):
     return "{0:b}".format(int(n))
 
 
+# VERY IMPORTAN!!! WE SHOULD MAKE SURE THAT WHEN THE CHILD IS 111 AKA MYNF3SH YA5OD AKTR
 def getChildren(next_color, state):
     print(decimalToBinary2(state))
     # printBinaryVal(state)
@@ -60,9 +64,6 @@ def miniMax(maxDepth, depth, isMaxPlayer, state):
         return (minChild, minValue)
 
 
-
-
-
 def miniMaxAlphaBeta(maxDepth, depth, isMaxPlayer, state, alpha, beta):
     if depth == maxDepth or isGameOver(state):
         return (state, getValue(state))
@@ -99,7 +100,9 @@ def miniMaxAlphaBeta(maxDepth, depth, isMaxPlayer, state, alpha, beta):
 
 # Check if the board is full
 def isGameOver(state):
-    return False
+    global GAME_OVER
+    return GAME_OVER
+
 
 # Fitness/Heuristic Function
 def getValue(state):
