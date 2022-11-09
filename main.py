@@ -199,7 +199,7 @@ def nextMove(alphaBetaPruning, state):  # The function returns the next best sta
 
 def miniMax(maxDepth, depth, isMaxPlayer, state):
     if depth == maxDepth or isGameOver(state):
-        return (state, getValue(state))
+        return (state, heuristic(state))
 
     children = getChildren(isMaxPlayer, state)
     BOARD.mapStates[state] = children
@@ -225,7 +225,7 @@ def miniMax(maxDepth, depth, isMaxPlayer, state):
 
 def miniMaxAlphaBeta(maxDepth, depth, isMaxPlayer, state, alpha, beta):
     if depth == maxDepth or isGameOver(state):
-        return (state, getValue(state))
+        return (state, heuristic(state))
 
     if isMaxPlayer:
         maxChild = None
@@ -269,8 +269,6 @@ def isGameOver(state):
 
 
 # Fitness/Heuristic Function
-def getValue(state):
-    return True
 
 
 # getChildren(1, int("1010100000010100000010100000010100000010100000010100000010100000", 2))
