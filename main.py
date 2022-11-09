@@ -2,6 +2,7 @@ import math
 import interface
 import numpy as np
 
+
 # 1: max, 0 min
 
 
@@ -22,6 +23,7 @@ BOARD = Board()
 5- Enhance the exploring order by exploring best moves first aka moves which places new item near to existing one
 """
 
+
 def set_bit(value, bit):
     return value | (1 << bit)
 
@@ -29,8 +31,10 @@ def set_bit(value, bit):
 def clear_bit(value, bit):
     return value & ~(1 << bit)
 
-def getLastLocationMask(state,col):
-    return (((7 << (60-(9*col))) & state) >> (60-(9*col)))
+
+def getLastLocationMask(state, col):
+    return ((7 << (60 - (9 * col))) & state) >> (60 - (9 * col))
+
 
 def decimalToBinary2(n):
     return "{0:b}".format(int(n))
@@ -42,33 +46,38 @@ def convertToTwoDimensions(state):
     k = 60
     startingBits = [59, 50, 41, 32, 23, 14, 5]
     for j in range(0, 7):
-        lastLocation = getLastLocationMask(state,j) - 1
+        lastLocation = getLastLocationMask(state, j) - 1
         k -= 9
         for row in range(0, lastLocation):
             currentBit = ((1 << (startingBits[j] - row)) & state) >> (startingBits[j] - row)
             twoDimensionalArray[row][j] = currentBit
     return twoDimensionalArray
 
+
 def convertToNumber(twoDimensionalState):
-    n = 1<<63
+    n = 1 << 63
     k = 60
     startingBits = [59, 50, 41, 32, 23, 14, 5]
     for j in range(0, 7):
-        flag =False
+        flag = False
         for i in range(0, 6):
             if twoDimensionalState[i][j] == 1:
                 n = set_bit(n, startingBits[j] - i)
             elif twoDimensionalState[i][j] == -1:
                 n = (((i + 1) << (k)) | n)
-                flag =True
+                flag = True
                 break
         if not flag:
-            n = ((7<<k)|n)
+            n = ((7 << k) | n)
         k -= 9
     return n
 
+
 print(convertToTwoDimensions(10378549747928563872))
-print(convertToNumber([[-1, -1, -1, -1, -1, -1, 1], [-1, -1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1, -1]]))
+print(convertToNumber([[-1, -1, -1, -1, -1, -1, 1], [-1, -1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1, -1],
+                       [-1, -1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1, -1]]))
+
+
 # 3  points for 4 -sure point
 # 2  points for 3 -candidate point
 # 1  point  for 2 -candidate point
@@ -145,7 +154,7 @@ def heuristic(state):
             print(str(i) + "--" + str(j))
             if array[i][j] != -1:
                 value += check_neigbours(i, j, array[i][j], array)
-    return value;
+    return value
 
 
 # print("---------------")
@@ -153,12 +162,6 @@ def heuristic(state):
 
 # print(heuristic(int("1010100000010100000010100000010100000010100000010100000010100000",2)))
 print("---------------")
-
-
-
-
-
-
 
 
 # max =1
@@ -267,9 +270,6 @@ def isGameOver(state):
             return False
         k -= 9
     return True
-
-
-
 
 # getChildren(1, int("1010100000010100000010100000010100000010100000010100000010100000", 2))
 # print((int("1010100000010100000010100000010100000010100000010100000010100000",2)))
