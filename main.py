@@ -266,6 +266,8 @@ def nextMove(alphaBetaPruning, state):  # The function returns the next best sta
         return miniMaxAlphaBeta(BOARD.maxDepth, 0, 1, state, -math.inf, math.inf)[0]
     return miniMax(BOARD.maxDepth, 0, 1, state)[0]
 
+print(convertToTwoDimensions(nextMove(1,14702005415974043712)))
+
 # getChildren(1, int("1010100000010100000010100000010100000010100000010100000010100000", 2))
 # print((int("1010100000010100000010100000010100000010100000010100000010100000",2)))
 # print(bin(1010100000010100000010100000010100000010100000010100000010100000))
