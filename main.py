@@ -107,9 +107,9 @@ def check_neigbours(x, y, value, array):
                 temp += map[array[x + i][y]]
         if temp > 1:
             if (value == 1):
-                print(str(temp) + " second cond")
+                print(str(temp) + " first cond")
             else:
-                print("-" + str(temp) + " second cond")
+                print("-" + str(temp) + " first cond")
             cost += temp
 
     if y <= 3:
@@ -135,16 +135,30 @@ def check_neigbours(x, y, value, array):
                 temp += map[array[x + i][y + i]]
         if temp > 1:
             if (value == 1):
-                print(str(temp) + " second cond")
+                print(str(temp) + " third cond")
             else:
-                print("-" + str(temp) + " second cond")
+                print("-" + str(temp) + " third cond")
+            cost += temp
+
+    if x <= 2 and y >= 3:
+        temp = 0
+        for i in range(0, 4):
+            if array[x + i][y - i] not in map:
+                temp += -50
+            else:
+                temp += map[array[x + i][y - i]]
+            print("--"+str(temp)+"---")
+        if temp > 1:
+            if (value == 1):
+                print(str(temp) + " fourth cond")
+            else:
+                print("-" + str(temp) + " fourth cond")
             cost += temp
 
     if value == 1:
         return cost
     else:
         return -cost
-
 
 def heuristic(state):
     array = convertToTwoDimensions(state)
@@ -159,12 +173,19 @@ def heuristic(state):
     return value
 
 
-# print("---------------")
-# print(heuristic(int("1011100000100100000101110000100111000010100000001000000001000000", 2)))
-
-# print(heuristic(int("1010100000010100000010100000010100000010100000010100000010100000",2)))
 print("---------------")
+twoDimensionalArray = []
+for i in range(0, 6):
+        twoDimensionalArray.insert(i, [1, 0, -1, -1, -1, -1, 1])
+print(twoDimensionalArray)
+print(sys.getsizeof(twoDimensionalArray))
 
+print(heuristic(int("1011100000100100000101110000100111000010100000011110000010100000", 2)))
+
+# print(heuristic(int("1011100000100100000101110000100111000010100000001000000001000000", 2)))
+print(sys.getsizeof(convertToTwoDimensions(int("1011100000100100000101110000100111000010100000001000000001000000", 2))))
+# print(heuristic(int("1010100000010100000010100000010100000010100000010100000010100000",2)))
+print("akhira heu--------------")
 
 # max =1
 # min =0
