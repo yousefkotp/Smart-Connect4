@@ -64,7 +64,7 @@ def convertToNumber(twoDimensionalState):
             if twoDimensionalState[i][j] == 1:
                 n = set_bit(n, startingBits[j] - i)
             elif twoDimensionalState[i][j] == -1:
-                n = (((i + 1) << (k)) | n)
+                n = (((i + 1) << k) | n)
                 flag = True
                 break
         if not flag:
@@ -148,7 +148,7 @@ def check_neigbours(x, y, value, array):
 
 def heuristic(state):
     array = convertToTwoDimensions(state)
-    print((array))
+    print(array)
 
     value = 0
     for i in range(0, 6):
@@ -176,7 +176,7 @@ def getChildren(player, state):
     children = []
     for i in range(0, 7):
         temp_state = state
-        temp = ((7 << (k)) & temp_state) >> (k)
+        temp = ((7 << k) & temp_state) >> k
         if player == 1 and temp != 7:
             temp_state = state | (1 << (k - temp))
             temp_state = clear_bit(temp_state, k)
