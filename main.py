@@ -221,7 +221,7 @@ def miniMax(maxDepth, depth, isMaxPlayer, state):
         minValue = math.inf
         for child in children:
             childValue = miniMax(maxDepth, depth + 1, not isMaxPlayer, child)[1]
-            if childValue > minValue:
+            if childValue < minValue:
                 minValue = childValue
                 minChild = child
         return (minChild, minValue)
@@ -231,12 +231,13 @@ def miniMaxAlphaBeta(maxDepth, depth, isMaxPlayer, state, alpha, beta):
     if depth == maxDepth or isGameOver(state):
         return (state, heuristic(state))
 
+    children = getChildren(isMaxPlayer, state)
     if isMaxPlayer:
         maxChild = None
         maxValue = -math.inf
-        children = getChildren(isMaxPlayer, state)
+
         for child in children:
-            childValue = miniMaxAlphaBeta(maxDepth, depth + 1, not isMaxPlayer, child, alpha, beta)[1]
+            childValue = miniMaxAlphaBeta(maxDepth, depth + 1, False, child, alpha, beta)[1]
             if childValue > maxValue:
                 maxChild = child
                 maxValue = childValue
@@ -248,10 +249,9 @@ def miniMaxAlphaBeta(maxDepth, depth, isMaxPlayer, state, alpha, beta):
     else:
         minChild = None
         minValue = math.inf
-        children = getChildren(isMaxPlayer, state)
         for child in children:
-            childValue = miniMaxAlphaBeta(maxDepth, depth + 1, not isMaxPlayer, child, alpha, beta)[1]
-            if childValue > minValue:
+            childValue = miniMaxAlphaBeta(maxDepth, depth + 1, True, child, alpha, beta)[1]
+            if childValue < minValue:
                 minValue = childValue
                 minChild = child
             if minValue <= alpha:
@@ -263,10 +263,22 @@ def miniMaxAlphaBeta(maxDepth, depth, isMaxPlayer, state, alpha, beta):
 
 def nextMove(alphaBetaPruning, state):  # The function returns the next best state in integer form
     if alphaBetaPruning:
-        return miniMaxAlphaBeta(BOARD.maxDepth, 0, 1, state, -math.inf, math.inf)[0]
-    return miniMax(BOARD.maxDepth, 0, 1, state)[0]
+        return miniMaxAlphaBeta(BOARD.maxDepth, 0, True, state, -math.inf, math.inf)[0]
+    return miniMax(BOARD.maxDepth, 0, True, state)[0]
 
-print(convertToTwoDimensions(nextMove(1,14702005415974043712)))
+
+# print(heuristic(12114687404279889984))
+# print("\n")
+nextState = nextMove(0,12114687404279889984)
+print(convertToTwoDimensions(nextState))
+# print(heuristic(nextState))
+# print("\n")
+# print(heuristic(12117079941581930560))
+
+
+
+
+
 
 # getChildren(1, int("1010100000010100000010100000010100000010100000010100000010100000", 2))
 # print((int("1010100000010100000010100000010100000010100000010100000010100000",2)))
