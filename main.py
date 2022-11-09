@@ -3,7 +3,6 @@ import interface
 import numpy as np
 import sys
 
-
 # 1: max, 0 min
 
 
@@ -41,18 +40,8 @@ def decimalToBinary2(n):
     return "{0:b}".format(int(n))
 
 
-def isGameOver(state):
-    k = 60
-    for j in range(0, 7):
-        maxLocation = (((7 << k) & state) >> k)
-        if maxLocation != 7:
-            return False
-        k -= 9
-    return True
-
-
 def convertToTwoDimensions(state):
-    twoDimensionalArray = np.full((6, 7), -1, np.int8)
+    twoDimensionalArray = np.full((6, 7), -1,np.int8)
 
     k = 60
     startingBits = [59, 50, 41, 32, 23, 14, 5]
@@ -82,6 +71,7 @@ def convertToNumber(twoDimensionalState):
             n = ((7 << k) | n)
         k -= 9
     return n
+
 
 
 print(convertToNumber([[-1, -1, -1, -1, 1, 0, 1], [-1, -1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1, -1],
@@ -116,6 +106,10 @@ def check_neigbours(x, y, value, array):
             else:
                 temp += map[array[x + i][y]]
         if temp > 1:
+            if (value == 1):
+                print(str(temp) + " first cond")
+            else:
+                print("-" + str(temp) + " first cond")
             cost += temp
 
     if y <= 3:
@@ -126,6 +120,10 @@ def check_neigbours(x, y, value, array):
             else:
                 temp += map[array[x][y + i]]
         if temp > 1:
+            if (value == 1):
+                print(str(temp) + " second cond")
+            else:
+                print("-" + str(temp) + " second cond")
             cost += temp
 
     if x <= 2 and y <= 3:
@@ -136,6 +134,25 @@ def check_neigbours(x, y, value, array):
             else:
                 temp += map[array[x + i][y + i]]
         if temp > 1:
+            if (value == 1):
+                print(str(temp) + " third cond")
+            else:
+                print("-" + str(temp) + " third cond")
+            cost += temp
+
+    if x <= 2 and y >= 3:
+        temp = 0
+        for i in range(0, 4):
+            if array[x + i][y - i] not in map:
+                temp += -50
+            else:
+                temp += map[array[x + i][y - i]]
+            print("--"+str(temp)+"---")
+        if temp > 1:
+            if (value == 1):
+                print(str(temp) + " fourth cond")
+            else:
+                print("-" + str(temp) + " fourth cond")
             cost += temp
 
     if value == 1:
@@ -143,30 +160,39 @@ def check_neigbours(x, y, value, array):
     else:
         return -cost
 
-
 def heuristic(state):
     array = convertToTwoDimensions(state)
+    print(array)
 
     value = 0
     for i in range(0, 6):
         for j in range(0, 7):
+            print(str(i) + "--" + str(j))
             if array[i][j] != -1:
                 value += check_neigbours(i, j, array[i][j], array)
     return value
 
 
-# print("---------------")
-# print(heuristic(int("1011100000100100000101110000100111000010100000001000000001000000", 2)))
-
-# print(heuristic(int("1010100000010100000010100000010100000010100000010100000010100000",2)))
 print("---------------")
+twoDimensionalArray = []
+for i in range(0, 6):
+        twoDimensionalArray.insert(i, [1, 0, -1, -1, -1, -1, 1])
+print(twoDimensionalArray)
+print(sys.getsizeof(twoDimensionalArray))
 
+print(heuristic(int("1011100000100100000101110000100111000010100000011110000010100000", 2)))
+
+# print(heuristic(int("1011100000100100000101110000100111000010100000001000000001000000", 2)))
+print(sys.getsizeof(convertToTwoDimensions(int("1011100000100100000101110000100111000010100000001000000001000000", 2))))
+# print(heuristic(int("1010100000010100000010100000010100000010100000010100000010100000",2)))
+print("akhira heu--------------")
 
 # max =1
 # min =0
 
 
 def getChildren(player, state):
+    print(decimalToBinary2(state))
     k = 60
     children = []
     for i in range(0, 7):
@@ -178,6 +204,7 @@ def getChildren(player, state):
             temp_state = clear_bit(temp_state, k + 1)
             temp_state = clear_bit(temp_state, k + 2)
             temp_state = temp_state | ((temp + 1) << k)
+            print(decimalToBinary2(temp_state))
             children.append(temp_state)
         elif player == 0 and temp != 7:
             temp_state = clear_bit(temp_state, k - temp)
@@ -186,8 +213,15 @@ def getChildren(player, state):
             temp_state = clear_bit(temp_state, k + 2)
             temp_state = temp_state | ((temp + 1) << k)
             children.append(temp_state)
+            print(decimalToBinary2(temp_state))
         k -= 9
     return children
+
+
+def nextMove(alphaBetaPruning, state):  # The function returns the next best state in integer form
+    if alphaBetaPruning:
+        return miniMaxAlphaBeta(BOARD.maxDepth, 0, 1, state, -math.inf, math.inf)[0]
+    return miniMax(BOARD.maxDepth, 0, 1, state)[0]
 
 
 def miniMax(maxDepth, depth, isMaxPlayer, state):
@@ -250,15 +284,15 @@ def miniMaxAlphaBeta(maxDepth, depth, isMaxPlayer, state, alpha, beta):
         return (minChild, minValue)
 
 
-def nextMove(alphaBetaPruning, state):  # The function returns the next best state in integer form
-    if alphaBetaPruning:
-        return miniMaxAlphaBeta(15, 0, 1, state, -math.inf, math.inf)[0]
-    return miniMax(BOARD.maxDepth, 0, 1, state)[0]
-
-
-print(convertToTwoDimensions(nextMove(1, 10378549747928563776)))
 # Check if the state makes the board full
-
+def isGameOver(state):
+    k = 60
+    for j in range(0, 7):
+        maxLocation = (((7 << k) & state) >> k)
+        if maxLocation != 7:
+            return False
+        k -= 9
+    return True
 
 # getChildren(1, int("1010100000010100000010100000010100000010100000010100000010100000", 2))
 # print((int("1010100000010100000010100000010100000010100000010100000010100000",2)))
