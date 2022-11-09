@@ -73,9 +73,11 @@ def convertToNumber(twoDimensionalState):
     return n
 
 
-print(convertToTwoDimensions(10378549747928563872))
-print(convertToNumber([[-1, -1, -1, -1, -1, -1, 1], [-1, -1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1, -1],
+
+print(convertToNumber([[-1, -1, -1, -1, 1, 0, 1], [-1, -1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1, -1],
                        [-1, -1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1, -1]]))
+
+print(convertToTwoDimensions(10378549747953762464))
 
 
 # 3  points for 4 -sure point
