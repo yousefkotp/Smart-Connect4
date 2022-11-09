@@ -1,6 +1,7 @@
 import math
 import interface
 
+
 # 1: max, 0 min
 
 
@@ -21,6 +22,12 @@ BOARD = Board()
 5- Enhance the exploring order by exploring best moves first aka moves which places new item near to existing one
 """
 
+def set_bit(value, bit):
+    return value | (1 << bit)
+
+
+def clear_bit(value, bit):
+    return value & ~(1 << bit)
 
 def decimalToBinary2(n):
     return "{0:b}".format(int(n))
@@ -41,18 +48,32 @@ def convertToTwoDimensions(state):
             twoDimensionalArray[row][j] = currentBit
     return twoDimensionalArray
 
+def convertToNumber(twoDimensionalState):
+    n = 1<<63  # Equivalent to 111000000 for each column
+    k = 60
+    startingBits = [59, 50, 41, 32, 23, 14, 5]
+    for j in range(0, 7):
+        flag =False
+        for i in range(0, 6):
+            if twoDimensionalState[i][j] == 1:
+                n = set_bit(n, startingBits[j] - i)
+            elif twoDimensionalState[i][j] == -1:
+                n = (((i + 1) << (k)) | n)
+                flag =True
+                break
+        if not flag:
+            n = ((7<<k)|n)
+        k -= 9
+    return n
 
-
-
-
-
-
-#3  points for 4 -sure point
-#2  points for 3 -candidate point
-#1  point  for 2 -candidate point
-#-4 points for 4 -sure opponent point
-#-3 points for 3 -candidate opponent point
-#-2 points for 2 -candidate opponent point
+print(convertToTwoDimensions(10378549747928563872))
+print(convertToNumber([[-1, -1, -1, -1, -1, -1, 1], [-1, -1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1, -1]]))
+# 3  points for 4 -sure point
+# 2  points for 3 -candidate point
+# 1  point  for 2 -candidate point
+# -4 points for 4 -sure opponent point
+# -3 points for 3 -candidate opponent point
+# -2 points for 2 -candidate opponent point
 
 
 # the value is
@@ -60,51 +81,51 @@ def convertToTwoDimensions(state):
 
 # 1 us
 # 0 user
-def check_neigbours( x , y , value , array ):
-    cost=0
-    map={}
-    map[value]=1
-    map[-1]=0
+def check_neigbours(x, y, value, array):
+    cost = 0
+    map = {}
+    map[value] = 1
+    map[-1] = 0
     if x <= 2:
-        temp=0
-        for i in range (0,4):
-            if array[x+i][y] not in map:
-                temp+=-50
-            else:
-                temp+=map[array[x+i][y]]
-        if temp>1:
-            if (value == 1):
-                print(str(temp) + " second cond")
-            else:
-                print("-"+str(temp) +" second cond")
-            cost+=temp
-
-    if y <= 3:
-        temp=0
-        for i in range(0,4):
-            if array[x][y+i] not in map:
-                temp+=-50
-            else:
-                temp+=map[array[x][y+i]]
-        if temp>1:
-            if(value==1):
-                print(str(temp) +" second cond")
-            else:
-                print("-"+str(temp) +" second cond")
-            cost+=temp
-
-    if x <= 2 and y <= 3:
-        temp=0
-        for i in range(0,4):
-            if array[x+i][y+i] not in map:
+        temp = 0
+        for i in range(0, 4):
+            if array[x + i][y] not in map:
                 temp += -50
             else:
-                temp += map[array[x+i][y+i]]
-        if temp >1:
+                temp += map[array[x + i][y]]
+        if temp > 1:
             if (value == 1):
                 print(str(temp) + " second cond")
             else:
-                print("-"+str(temp) +" second cond")
+                print("-" + str(temp) + " second cond")
+            cost += temp
+
+    if y <= 3:
+        temp = 0
+        for i in range(0, 4):
+            if array[x][y + i] not in map:
+                temp += -50
+            else:
+                temp += map[array[x][y + i]]
+        if temp > 1:
+            if (value == 1):
+                print(str(temp) + " second cond")
+            else:
+                print("-" + str(temp) + " second cond")
+            cost += temp
+
+    if x <= 2 and y <= 3:
+        temp = 0
+        for i in range(0, 4):
+            if array[x + i][y + i] not in map:
+                temp += -50
+            else:
+                temp += map[array[x + i][y + i]]
+        if temp > 1:
+            if (value == 1):
+                print(str(temp) + " second cond")
+            else:
+                print("-" + str(temp) + " second cond")
             cost += temp
 
     if value == 1:
@@ -112,21 +133,22 @@ def check_neigbours( x , y , value , array ):
     else:
         return -cost
 
-def  heuristic(state):
-    array=convertToTwoDimensions(state)
+
+def heuristic(state):
+    array = convertToTwoDimensions(state)
     print((array))
 
-    value=0
-    for i in range(0,6):
-        for j in range(0,7):
-            print(str(i)+"--"+str(j))
+    value = 0
+    for i in range(0, 6):
+        for j in range(0, 7):
+            print(str(i) + "--" + str(j))
             if array[i][j] != -1:
-                value+=check_neigbours(i,j,array[i][j],array)
+                value += check_neigbours(i, j, array[i][j], array)
     return value;
 
 
-print("---------------")
-print(heuristic(int("1011100000100100000101110000100111000010100000001000000001000000",2)))
+# print("---------------")
+# print(heuristic(int("1011100000100100000101110000100111000010100000001000000001000000", 2)))
 
 # print(heuristic(int("1010100000010100000010100000010100000010100000010100000010100000",2)))
 print("---------------")
@@ -137,25 +159,6 @@ print("---------------")
 
 
 
-def set_bit(value, bit):
-    return value | (1 << bit)
-
-
-def clear_bit(value, bit):
-    return value & ~(1 << bit)
-
-def convertToNumber(twoDimensionalState):
-    n = 17309616014371291584 # Equivalent to 111000000 for each column
-    k=60
-    startingBits = [59, 50, 41, 32, 23, 14, 5]
-    for j in range(0, 7):
-        for i in range(0, 6):
-            if twoDimensionalState[i][j] == 1:
-                n = set_bit(n, startingBits[j] - i)
-            elif twoDimensionalState[i][j]==-1:
-                n = (((j+1) << (k)) & n)
-        k-=9
-    return n
 
 # max =1
 # min =0
@@ -270,7 +273,7 @@ def getValue(state):
     return True
 
 
-getChildren(1, int("1010100000010100000010100000010100000010100000010100000010100000", 2))
+# getChildren(1, int("1010100000010100000010100000010100000010100000010100000010100000", 2))
 # print((int("1010100000010100000010100000010100000010100000010100000010100000",2)))
 # print(bin(1010100000010100000010100000010100000010100000010100000010100000))
 # print(intoBinary(int("1010100000010100000010100000010100000010100000010100000010100000",2)))
