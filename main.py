@@ -1,7 +1,7 @@
 import math
 import interface
 import numpy as np
-
+import sys
 
 # 1: max, 0 min
 
@@ -41,7 +41,7 @@ def decimalToBinary2(n):
 
 
 def convertToTwoDimensions(state):
-    twoDimensionalArray = np.full((6, 7), -1)
+    twoDimensionalArray = np.full((6, 7), -1,np.int8)
 
     k = 60
     startingBits = [59, 50, 41, 32, 23, 14, 5]
@@ -77,7 +77,7 @@ def convertToNumber(twoDimensionalState):
 print(convertToNumber([[-1, -1, -1, -1, 1, 0, 1], [-1, -1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1, -1],
                        [-1, -1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1, -1]]))
 
-print(convertToTwoDimensions(10378549747953762464))
+print(sys.getsizeof(convertToTwoDimensions(10378549747953762464)))
 
 
 # 3  points for 4 -sure point
