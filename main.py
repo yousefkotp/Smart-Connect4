@@ -1,6 +1,6 @@
 import math
 import interface
-
+import numpy as np
 
 # 1: max, 0 min
 
@@ -29,19 +29,20 @@ def set_bit(value, bit):
 def clear_bit(value, bit):
     return value & ~(1 << bit)
 
+def getLastLocationMask(state,col):
+    return (((7 << (60-(9*col))) & state) >> (60-(9*col)))
+
 def decimalToBinary2(n):
     return "{0:b}".format(int(n))
 
 
 def convertToTwoDimensions(state):
-    twoDimensionalArray = []
+    twoDimensionalArray = np.full((6, 7), -1)
 
-    for i in range(0, 6):
-        twoDimensionalArray.insert(i, [-1, -1, -1, -1, -1, -1, -1])
     k = 60
     startingBits = [59, 50, 41, 32, 23, 14, 5]
     for j in range(0, 7):
-        lastLocation = (((7 << k) & state) >> k) - 1
+        lastLocation = getLastLocationMask(state,j) - 1
         k -= 9
         for row in range(0, lastLocation):
             currentBit = ((1 << (startingBits[j] - row)) & state) >> (startingBits[j] - row)
@@ -49,7 +50,7 @@ def convertToTwoDimensions(state):
     return twoDimensionalArray
 
 def convertToNumber(twoDimensionalState):
-    n = 1<<63  # Equivalent to 111000000 for each column
+    n = 1<<63
     k = 60
     startingBits = [59, 50, 41, 32, 23, 14, 5]
     for j in range(0, 7):
@@ -268,7 +269,6 @@ def isGameOver(state):
     return True
 
 
-# Fitness/Heuristic Function
 
 
 # getChildren(1, int("1010100000010100000010100000010100000010100000010100000010100000", 2))
