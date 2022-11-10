@@ -1,7 +1,17 @@
 import math
-import interface
+
 import numpy as np
-import sys
+
+DEPTH = 1
+
+
+def getDepth():
+    return DEPTH
+
+
+def setDepth(depth):
+    global DEPTH
+    DEPTH = depth
 
 
 # 1: max, 0 min
@@ -10,7 +20,7 @@ import sys
 class Board:
     def __init__(self):
         self.state = 1 << 63
-        self.maxDepth = interface.DEPTH
+        self.maxDepth = DEPTH
         self.mapStates = {}
 
 
@@ -85,10 +95,8 @@ def convertToNumber(twoDimensionalState):
     return n
 
 
-print(convertToNumber([[-1, -1, -1, -1, 1, 0, 1], [-1, -1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1, -1],
-                       [-1, -1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1, -1]]))
-
-print(sys.getsizeof(convertToTwoDimensions(10378549747953762464)))
+#
+# print(sys.getsizeof(convertToTwoDimensions(10378549747953762464)))
 
 
 # 3  points for 4 -sure point
@@ -266,18 +274,13 @@ def nextMove(alphaBetaPruning, state):  # The function returns the next best sta
         return miniMaxAlphaBeta(BOARD.maxDepth, 0, True, state, -math.inf, math.inf)[0]
     return miniMax(BOARD.maxDepth, 0, True, state)[0]
 
-
 # print(heuristic(12114687404279889984))
 # print("\n")
-nextState = nextMove(0,12114687404279889984)
-print(convertToTwoDimensions(nextState))
+# nextState = nextMove(0,12114687404279889984)
+# print(convertToTwoDimensions(nextState))
 # print(heuristic(nextState))
 # print("\n")
 # print(heuristic(12117079941581930560))
-
-
-
-
 
 
 # getChildren(1, int("1010100000010100000010100000010100000010100000010100000010100000", 2))
