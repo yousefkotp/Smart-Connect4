@@ -78,6 +78,9 @@ GAME_MODE = -1
 SINGLE_PLAYER = 1
 TWO_PLAYERS = 2
 
+# Developer Mode: facilitates debugging during GUI development
+DEVMODE = False
+
 
 class GameWindow:
     def setupGameWindow(self):
@@ -170,6 +173,9 @@ class GameWindow:
                     (player1ScoreSlot.x + player1ScoreSlot.width / player1ScoreLength, scoreBoard_Y + 15))
         screen.blit(player2ScoreCounter,
                     (player2ScoreSlot.x + player2ScoreSlot.width / player2ScoreLength, scoreBoard_Y + 15))
+
+    def mouseOverMainLabel(self):
+        return 30 <= pygame.mouse.get_pos()[1] <= 55 and 810 <= pygame.mouse.get_pos()[0] <= 1030
 
     def refreshStats(self):
         """
@@ -356,6 +362,8 @@ class GameWindow:
             elif GAME_OVER and playAgainButton.isOver(event.pos):
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
                 alterButtonAppearance(playAgainButton, WHITE, BLACK, True, WHITE, GOLD, 22)
+            elif self.mouseOverMainLabel():
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
             else:
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
                 alterButtonAppearance(showStatsButton, LIGHTGREY, BLACK)
@@ -376,6 +384,10 @@ class GameWindow:
                 self.togglePruningCheckbox()
             elif GAME_OVER and playAgainButton.isOver(event.pos):
                 alterButtonAppearance(playAgainButton, GOLD, BLACK, True, GOLD, CYAN)
+            elif self.mouseOverMainLabel():
+                self.resetEverything()
+                mainMenu.setupMainMenu()
+                mainMenu.show()
 
         if event.type == pygame.MOUSEBUTTONUP:
             if showStatsButton.isOver(event.pos):
@@ -389,6 +401,13 @@ class GameWindow:
             elif GAME_OVER and playAgainButton.isOver(event.pos):
                 alterButtonAppearance(playAgainButton, GOLD, BLACK, True, WHITE, GOLD)
                 self.resetEverything()
+
+        if DEVMODE:
+            pygame.draw.rect(screen, BLACK, (BOARD_LAYOUT_END_X + 20, 70, WIDTH - BOARD_LAYOUT_END_X - 40, 40))
+            pygame.mouse.set_visible(True)
+            titleFont = pygame.font.SysFont("Sans Serif", 20, False, True)
+            coordinates = titleFont.render(str(pygame.mouse.get_pos()), True, WHITE)
+            screen.blit(coordinates, (BOARD_LAYOUT_END_X + 100, 80))
 
     def takeNewDepth(self):
         """
@@ -558,6 +577,8 @@ class MainMenu:
         """
         Initializes the all components in the frame
         """
+        global GAME_MODE
+        GAME_MODE = -1
         pygame.display.flip()
         pygame.display.set_caption('Smart Connect4 :) - Main Menu')
         self.refreshMainMenu()
