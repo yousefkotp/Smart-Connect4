@@ -22,6 +22,7 @@ class Board:
         self.state = 1 << 63
         self.maxDepth = DEPTH
         self.mapStates = {}
+        self.bestMove = {}
 
 
 BOARD = Board()
@@ -174,16 +175,8 @@ def heuristic(state):
     return value
 
 
-# print(heuristic(int("1011100000100100000101110000100111000010100000011110000010100000", 2)))
-
-# print(heuristic(int("1011100000100100000101110000100111000010100000001000000001000000", 2)))
-# print(sys.getsizeof(convertToTwoDimensions(int("1011100000100100000101110000100111000010100000001000000001000000", 2))))
-# print(heuristic(int("1010100000010100000010100000010100000010100000010100000010100000",2)))
-# print("akhira heu--------------")
-
 # max =1
 # min =0
-
 
 def getChildren(player, state):
     k = 60
@@ -211,7 +204,7 @@ def getChildren(player, state):
 
 def miniMax(maxDepth, depth, isMaxPlayer, state):
     if depth == maxDepth or isGameOver(state):
-        return (state, heuristic(state))
+        return state, heuristic(state)
 
     children = getChildren(isMaxPlayer, state)
     BOARD.mapStates[state] = children
@@ -223,7 +216,8 @@ def miniMax(maxDepth, depth, isMaxPlayer, state):
             if childValue > maxValue:
                 maxChild = child
                 maxValue = childValue
-        return (maxChild, maxValue)
+        BOARD.bestMove[state] = maxChild
+        return maxChild, maxValue
     else:
         minChild = None
         minValue = math.inf
@@ -232,14 +226,15 @@ def miniMax(maxDepth, depth, isMaxPlayer, state):
             if childValue < minValue:
                 minValue = childValue
                 minChild = child
-        return (minChild, minValue)
+        return minChild, minValue
 
 
 def miniMaxAlphaBeta(maxDepth, depth, isMaxPlayer, state, alpha, beta):
     if depth == maxDepth or isGameOver(state):
-        return (state, heuristic(state))
+        return state, heuristic(state)
 
     children = getChildren(isMaxPlayer, state)
+    BOARD.mapStates[state] = children
     if isMaxPlayer:
         maxChild = None
         maxValue = -math.inf
@@ -253,7 +248,8 @@ def miniMaxAlphaBeta(maxDepth, depth, isMaxPlayer, state, alpha, beta):
                 break
             if maxValue > alpha:
                 alpha = maxValue
-        return (maxChild, maxValue)
+        BOARD.bestMove[state] = maxChild
+        return maxChild, maxValue
     else:
         minChild = None
         minValue = math.inf
@@ -266,13 +262,22 @@ def miniMaxAlphaBeta(maxDepth, depth, isMaxPlayer, state, alpha, beta):
                 break
             if minValue < beta:
                 beta = minValue
-        return (minChild, minValue)
+        return minChild, minValue
 
 
 def nextMove(alphaBetaPruning, state):  # The function returns the next best state in integer form
+    if state in BOARD.bestMove.keys():
+        return BOARD.bestMove[state]
     if alphaBetaPruning:
-        return miniMaxAlphaBeta(BOARD.maxDepth, 0, True, state, -math.inf, math.inf)[0]
-    return miniMax(BOARD.maxDepth, 0, True, state)[0]
+        return miniMaxAlphaBeta(5, 0, True, state, -math.inf, math.inf)[0]
+    return miniMax(5, 0, True, state)[0]
+
+
+# temp = np.full((6, 7), -1, np.int8)
+# print(temp.itemsize)
+# print(temp.size)
+# print(sys.getsizeof(temp))
+
 
 # print(heuristic(12114687404279889984))
 # print("\n")
@@ -290,6 +295,12 @@ def nextMove(alphaBetaPruning, state):  # The function returns the next best sta
 # DecimalToBinary(int("1010100000010100000010100000010100000010100000010100000010100000",2))
 # print(string)
 
+
+# print(heuristic(int("1011100000100100000101110000100111000010100000011110000010100000", 2)))
+
+# print(heuristic(int("1011100000100100000101110000100111000010100000001000000001000000", 2)))
+# print(sys.getsizeof(convertToTwoDimensions(int("1011100000100100000101110000100111000010100000001000000001000000", 2))))
+# print(heuristic(int("1010100000010100000010100000010100000010100000010100000010100000",2)))
 
 # ---------------------------------------------------------------------
 
