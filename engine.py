@@ -2,27 +2,21 @@ import math
 
 import numpy as np
 
-DEPTH = 1
-
-
-def getDepth():
-    return DEPTH
-
-
-def setDepth(depth):
-    global DEPTH
-    DEPTH = depth
-
-
 # 1: max, 0 min
 
 
 class Board:
     def __init__(self):
         self.state = 1 << 63
-        self.maxDepth = DEPTH
+        self.maxDepth = 1
         self.mapStates = {}
         self.bestMove = {}
+
+    def getDepth(self):
+        return self.maxDepth
+
+    def setDepth(self, depth):
+        self.maxDepth = depth
 
 
 BOARD = Board()
