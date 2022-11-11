@@ -511,6 +511,20 @@ class GameWindow:
                 GAME_BOARD[i][j] += 1
                 newState[i][j] += 1
 
+        newC = self.getNewMove(newState=newState, oldState=GAME_BOARD)
+
+
+        boardLayout = pygame.draw.rect(screen, BOARD_LAYOUT_BACKGROUND,
+                                       (0, BOARD_BEGIN_Y - SQUARE_SIZE, BOARD_WIDTH + SQUARE_SIZE / 2, SQUARE_SIZE))
+        for i in range(BOARD_BEGIN_X, math.ceil(BOARD_BEGIN_X + newC * SQUARE_SIZE + SQUARE_SIZE/2), 2):
+            gradientRect(screen, DARKER_GREY, DARKGREY, boardLayout)
+            pygame.draw.circle(
+                screen, PIECE_COLORS[TURN], (i, int(SQUARE_SIZE / 2)), PIECE_RADIUS)
+            pygame.display.update()
+        self.refreshGameWindow()
+
+        self.hoverPieceOverSlot()
+
         GAME_BOARD = newState
         self.computeScore()
 
@@ -526,6 +540,15 @@ class GameWindow:
         GAME_OVER = False
         TURN = 1
         self.setupGameWindow()
+
+    def getNewMove(self, newState, oldState) -> int:
+        """
+        :return: New move made by the AI
+        """
+        for r in range(ROW_COUNT):
+            for c in range(COLUMN_COUNT):
+                if newState[r][c] != oldState[r][c]:
+                    return c
 
     def computeScore(self):
         """

@@ -299,8 +299,8 @@ def nextMove(alphaBetaPruning, state):  # The function returns the next best sta
     # if state in BOARD.bestMove.keys():
     #     return BOARD.bestMove[state]
     if alphaBetaPruning:
-        return miniMaxAlphaBeta(1, 0, True, state, -math.inf, math.inf)[0]
-    return miniMax(1, 0, True, state)[0]
+        return miniMaxAlphaBeta(BOARD.maxDepth, 0, True, state, -math.inf, math.inf)[0]
+    return miniMax(BOARD.maxDepth, 0, True, state)[0]
 
 
 # temp = np.full((6, 7), -1, np.int8)
