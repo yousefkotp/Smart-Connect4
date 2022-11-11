@@ -203,6 +203,9 @@ class GameWindow:
         """
         Refreshes the analysis section
         """
+        global statsPanelY
+        if GAME_OVER:
+            statsPanelY = showStatsButton.y + showStatsButton.height + 5
         if GAME_MODE == SINGLE_PLAYER:
             pygame.draw.rect(
                 screen, BLACK,
@@ -233,17 +236,16 @@ class GameWindow:
             width=WIDTH - BOARD_LAYOUT_END_X - 20, height=30, text="Contributors")
         contributorsButton.draw(BLACK)
 
-        if not GAME_OVER:
-            settingsButton = Button(window=screen, color=(82, 82, 82), x=WIDTH - 48, y=BOARD_BEGIN_Y - 38,
-                                    width=35, height=35)
-
-            homeButton = Button(window=screen, color=(79, 79, 79), x=WIDTH - 88, y=BOARD_BEGIN_Y - 38,
+        settingsButton = Button(window=screen, color=(82, 82, 82), x=WIDTH - 48, y=BOARD_BEGIN_Y - 38,
                                 width=35, height=35)
-            self.reloadSettingsButton(settingsIcon)
-            self.reloadHomeButton(homeIcon)
 
-            showStatsButton_Y = 250
-        else:
+        homeButton = Button(window=screen, color=(79, 79, 79), x=WIDTH - 88, y=BOARD_BEGIN_Y - 38,
+                            width=35, height=35)
+        self.reloadSettingsButton(settingsIcon)
+        self.reloadHomeButton(homeIcon)
+
+        showStatsButton_Y = 250
+        if GAME_OVER:
             showStatsButton_Y = 330
 
             playAgainButton = Button(
@@ -457,9 +459,9 @@ class GameWindow:
         global GAME_OVER, TURN, GAME_BOARD, gameInSession
         gameInSession = True
         while True:
+            pygame.display.update()
             if not GAME_OVER:
                 self.hoverPieceOverSlot()
-            pygame.display.update()
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
