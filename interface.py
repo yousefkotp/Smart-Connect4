@@ -71,6 +71,7 @@ GAME_OVER = False
 PLAYER_SCORE = [0, 0, 0]
 GAME_BOARD = [[]]
 usePruning = True
+useTranspositionTable = False
 screen = pygame.display.set_mode(WINDOW_SIZE)
 GAME_MODE = -1
 gameInSession = False
@@ -124,13 +125,29 @@ class GameWindow:
             screen.blit(player1ScoreCaption, (BOARD_LAYOUT_END_X + 48, 210))
             screen.blit(player2ScoreCaption, (BOARD_LAYOUT_END_X + 170, 210))
 
-            depthFont = pygame.font.SysFont("Serif", 23 - len(str(engine.BOARD.getDepth())))
-            depthLabel = depthFont.render("k = " + str(engine.BOARD.getDepth()), True, BLACK)
-            screen.blit(depthLabel, (WIDTH - 100, 294))
+            if GAME_MODE == SINGLE_PLAYER:
+                global statsPanelY
+                depthFont = pygame.font.SysFont("Serif", math.ceil(23 - len(str(engine.BOARD.getDepth())) / 4))
+                depthLabel = depthFont.render("k = " + str(engine.BOARD.getDepth()), True, BLACK)
 
-            depthFont = pygame.font.SysFont("Arial", 16)
-            depthLabel = depthFont.render("Use alpha-beta pruning", True, BLACK)
-            screen.blit(depthLabel, (BOARD_LAYOUT_END_X + 65, 340))
+                tempWidth = WIDTH - (BOARD_LAYOUT_END_X + 10)
+                centerX = BOARD_LAYOUT_END_X + 10 + (tempWidth / 2 - depthLabel.get_width() / 2)
+                screen.blit(depthLabel, (centerX, 294))
+                statsPanelY = 320
+
+                if usePruning:
+                    depthFont = pygame.font.SysFont("Arial", 16)
+                    depthLabel = depthFont.render("Using alpha-beta pruning", True, GOLD)
+                    centerX = BOARD_LAYOUT_END_X + 10 + (tempWidth / 2 - depthLabel.get_width() / 2)
+                    screen.blit(depthLabel, (centerX, 320))
+                    statsPanelY += 20
+
+                if useTranspositionTable:
+                    depthFont = pygame.font.SysFont("Arial", 16)
+                    depthLabel = depthFont.render("Using transposition table", True, DARKGREEN)
+                    centerX = BOARD_LAYOUT_END_X + 10 + (tempWidth / 2 - depthLabel.get_width() / 2)
+                    screen.blit(depthLabel, (centerX, statsPanelY))
+                    statsPanelY += 20
 
         else:
             if PLAYER_SCORE[PLAYER1] == PLAYER_SCORE[PLAYER2]:
@@ -186,8 +203,14 @@ class GameWindow:
         """
         Refreshes the analysis section
         """
-        pygame.draw.rect(screen, BLACK, (BOARD_LAYOUT_END_X + 9, 369, WIDTH - BOARD_LAYOUT_END_X - 18, 267), 0)
-        pygame.draw.rect(screen, GREY, (BOARD_LAYOUT_END_X + 10, 370, WIDTH - BOARD_LAYOUT_END_X - 20, 265))
+        if GAME_MODE == SINGLE_PLAYER:
+            pygame.draw.rect(
+                screen, BLACK,
+                (BOARD_LAYOUT_END_X + 9, statsPanelY + 5, WIDTH - BOARD_LAYOUT_END_X - 18, 267 + (370 - statsPanelY)),
+                0)
+            pygame.draw.rect(
+                screen, GREY,
+                (BOARD_LAYOUT_END_X + 10, statsPanelY + 6, WIDTH - BOARD_LAYOUT_END_X - 20, 265 + (370 - statsPanelY)))
 
     ######   Buttons    ######
 
@@ -228,11 +251,12 @@ class GameWindow:
                 width=WIDTH - BOARD_LAYOUT_END_X - 20, height=120, text="Play Again")
             playAgainButton.draw()
 
-        showStatsButton = Button(
-            screen, color=LIGHTGREY,
-            x=BOARD_LAYOUT_END_X + 10, y=showStatsButton_Y,
-            width=WIDTH - BOARD_LAYOUT_END_X - 20, height=30, text="Show nerdy stats :D")
-        showStatsButton.draw(BLACK)
+        if GAME_MODE == SINGLE_PLAYER:
+            showStatsButton = Button(
+                screen, color=LIGHTGREY,
+                x=BOARD_LAYOUT_END_X + 10, y=showStatsButton_Y,
+                width=WIDTH - BOARD_LAYOUT_END_X - 20, height=30, text="Show nerdy stats :D")
+            showStatsButton.draw(BLACK)
 
     def reloadSettingsButton(self, icon):
         settingsButton.draw()
@@ -352,7 +376,7 @@ class GameWindow:
         Handles button behaviour in response to mouse events influencing them
         """
         if event.type == pygame.MOUSEMOTION:
-            if showStatsButton.isOver(event.pos):
+            if GAME_MODE == SINGLE_PLAYER and showStatsButton.isOver(event.pos):
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
                 alterButtonAppearance(showStatsButton, WHITE, BLACK)
             elif contributorsButton.isOver(event.pos):
@@ -366,12 +390,15 @@ class GameWindow:
                 self.reloadHomeButton(homeIconAccent)
             elif GAME_OVER and playAgainButton.isOver(event.pos):
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
-                alterButtonAppearance(playAgainButton, WHITE, BLACK, True, WHITE, GOLD, 22)
+                alterButtonAppearance(
+                    button=playAgainButton, color=GOLD, outlineColor=BLACK, hasGradBackground=True,
+                    gradLeftColor=WHITE, gradRightColor=GOLD, fontSize=22)
             elif self.mouseOverMainLabel():
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
             else:
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
-                alterButtonAppearance(showStatsButton, LIGHTGREY, BLACK)
+                if GAME_MODE == SINGLE_PLAYER:
+                    alterButtonAppearance(showStatsButton, LIGHTGREY, BLACK)
                 alterButtonAppearance(contributorsButton, LIGHTGREY, BLACK)
                 self.reloadSettingsButton(settingsIcon)
                 self.reloadHomeButton(homeIcon)
@@ -379,12 +406,14 @@ class GameWindow:
                     alterButtonAppearance(playAgainButton, GOLD, BLACK)
 
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if showStatsButton.isOver(event.pos):
+            if GAME_MODE == SINGLE_PLAYER and showStatsButton.isOver(event.pos):
                 alterButtonAppearance(showStatsButton, CYAN, BLACK)
             elif contributorsButton.isOver(event.pos):
                 alterButtonAppearance(contributorsButton, CYAN, BLACK)
             elif GAME_OVER and playAgainButton.isOver(event.pos):
-                alterButtonAppearance(playAgainButton, GOLD, BLACK, True, GOLD, CYAN)
+                alterButtonAppearance(
+                    button=playAgainButton, color=GOLD, outlineColor=BLACK, hasGradBackground=True,
+                    gradLeftColor=GOLD, gradRightColor=CYAN)
             elif self.mouseOverMainLabel() or homeButton.isOver(event.pos):
                 self.resetEverything()
                 mainMenu.setupMainMenu()
@@ -395,13 +424,15 @@ class GameWindow:
                 settingsWindow.show()
 
         if event.type == pygame.MOUSEBUTTONUP:
-            if showStatsButton.isOver(event.pos):
+            if GAME_MODE == SINGLE_PLAYER and showStatsButton.isOver(event.pos):
                 alterButtonAppearance(showStatsButton, LIGHTGREY, BLACK)
             elif contributorsButton.isOver(event.pos):
                 alterButtonAppearance(contributorsButton, LIGHTGREY, BLACK)
                 self.showContributors()
             elif GAME_OVER and playAgainButton.isOver(event.pos):
-                alterButtonAppearance(playAgainButton, GOLD, BLACK, True, WHITE, GOLD)
+                alterButtonAppearance(
+                    button=playAgainButton, color=GOLD, outlineColor=BLACK, hasGradBackground=True,
+                    gradLeftColor=WHITE, gradRightColor=GOLD, fontSize=22)
                 self.resetEverything()
 
         if DEVMODE:
@@ -677,12 +708,9 @@ class Button:
         self.outLeftColor = outLeftColor
         self.outRightColor = outRightColor
 
-    def draw(self, outline=None, outlineThickness=2, font='comicsans', fontSize=15, ):
+    def draw(self, outline=None, outlineThickness=2, font='comicsans', fontSize=15, fontColor=BLACK):
         """
         Draws the button on screen
-        :param outline: Outline color
-        :param font: Font Name
-        :param fontSize: Font Size
         """
         if outline:
             rectOutline = pygame.draw.rect(self.screen, outline, (self.x, self.y,
@@ -697,7 +725,7 @@ class Button:
 
         if self.text != '':
             font = pygame.font.SysFont(font, fontSize)
-            text = font.render(self.text, True, (0, 0, 0))
+            text = font.render(self.text, True, fontColor)
             self.screen.blit(text, (
                 self.x + (self.width / 2 - text.get_width() / 2), self.y + (self.height / 2 - text.get_height() / 2)))
 
@@ -718,8 +746,6 @@ class SettingsWindow:
         self.show()
 
     def show(self):
-        pygame.display.update()
-        tk.messagebox.showinfo('', "Work in progress!")
         while True:
             pygame.display.update()
 
@@ -733,8 +759,6 @@ class SettingsWindow:
         """
         Initializes the all components in the frame
         """
-        global GAME_MODE
-        GAME_MODE = -1
         pygame.display.flip()
         pygame.display.set_caption('Smart Connect4 :) - Game Settings')
         self.refreshSettingsMenu()
@@ -749,25 +773,40 @@ class SettingsWindow:
         self.drawSettingsMenuLabels()
 
     def drawSettingsMenuButtons(self):
-        global backButton, modifyDepthButton, pruningCheckbox
+        global backButton, modifyDepthButton, pruningCheckbox, transpositionCheckbox, backIcon, backIconAccent
 
-        backButton = Button(window=screen, color=GREY, x=20, y=20, width=60, height=30, text='BACK')
-        backButton.draw(outline=WHITE, fontSize=20)
+        backIconAccent = pygame.image.load('GUI/back-icon.png').convert_alpha()
+        backIcon = pygame.image.load('GUI/back-icon-accent.png').convert_alpha()
 
-        modifyDepthButton = Button(
-            screen, color=LIGHTGREY,
-            x=BOARD_LAYOUT_END_X + 10, y=290,
-            width=WIDTH - BOARD_LAYOUT_END_X - 120, height=30, text="Modify depth k")
-        modifyDepthButton.draw(BLACK)
+        backButton = Button(window=screen, color=(26, 26, 120), x=WIDTH - 70, y=20, width=52, height=52)
+        self.reloadBackButton(backIcon)
+
 
         pruningCheckbox = Button(
             screen, color=WHITE,
-            x=30, y=250,
+            x=30, y=320,
             width=30, height=30, text="",
             gradCore=usePruning, coreLeftColor=DARKGOLD, coreRightColor=GOLD,
             gradOutline=True, outLeftColor=LIGHTGREY, outRightColor=GREY)
-
         self.togglePruningCheckbox(toggle=False)
+
+        transpositionCheckbox = Button(
+            screen, color=WHITE,
+            x=30, y=pruningCheckbox.y + pruningCheckbox.height + 20,
+            width=30, height=30, text="",
+            gradCore=useTranspositionTable, coreLeftColor=DARKGOLD, coreRightColor=GOLD,
+            gradOutline=True, outLeftColor=LIGHTGREY, outRightColor=GREY)
+        self.toggleTranspositionCheckbox(toggle=False)
+
+        modifyDepthButton = Button(
+            screen, color=LIGHTGREY,
+            x=30, y=transpositionCheckbox.y + transpositionCheckbox.height + 20,
+            width=200, height=50, text="Modify search depth k")
+        modifyDepthButton.draw(BLACK)
+
+    def reloadBackButton(self, icon):
+        backButton.draw()
+        screen.blit(icon, (backButton.x + 2, backButton.y + 2))
 
     def togglePruningCheckbox(self, toggle=True):
         global usePruning
@@ -779,10 +818,55 @@ class SettingsWindow:
         else:
             pruningCheckbox.draw(WHITE, outlineThickness=2)
 
+    def toggleTranspositionCheckbox(self, toggle=True):
+        global usePruning, useTranspositionTable
+        if toggle:
+            useTranspositionTable = transpositionCheckbox.isChecked \
+                = transpositionCheckbox.gradCore = not useTranspositionTable
+
+        if useTranspositionTable:
+            transpositionCheckbox.draw(WHITE, outlineThickness=4)
+        else:
+            transpositionCheckbox.draw(WHITE, outlineThickness=2)
+
     def drawSettingsMenuLabels(self):
+        global aiSettingsHR
+
         titleFont = pygame.font.SysFont("Sans Serif", 65, False, True)
+        subTitleFont = pygame.font.SysFont("Sans Serif", 50, False, True)
+        captionFont1_Arial = pygame.font.SysFont("Arial", 16)
+        captionFont1_SansSerif = pygame.font.SysFont("Sans Serif", 16)
+        captionFont2_Arial = pygame.font.SysFont("Arial", 23)
+        captionFont2_SansSerif = pygame.font.SysFont("Sans Serif", 23)
+
         mainLabel = titleFont.render("Game Settings", True, WHITE)
-        screen.blit(mainLabel, (WIDTH / 3, HEIGHT / 8))
+        aiSettingsSubtitle = subTitleFont.render("AI Settings", True, WHITE)
+        pruningCaption = captionFont1_Arial.render("Use alpha-beta pruning", True, WHITE)
+        transpositionCaption = captionFont1_Arial.render("Use transposition table", True, WHITE)
+        depthCaption = captionFont2_Arial.render("k = " + str(engine.BOARD.getDepth()), True, WHITE)
+        backLabel = captionFont2_SansSerif.render("BACK", True, WHITE)
+
+        screen.blit(backLabel, (backButton.x + 5, backButton.y + backButton.height + 8))
+
+        screen.blit(mainLabel, (WIDTH / 2 - mainLabel.get_width() / 2, HEIGHT / 8))
+
+        screen.blit(aiSettingsSubtitle, (20, 250))
+        aiSettingsHR = pygame.draw.rect(
+            surface=screen,
+            color=GREY,
+            rect=(10, 250 + aiSettingsSubtitle.get_height() + 10, 600, 4))
+
+        screen.blit(pruningCaption,
+                    (pruningCheckbox.x + pruningCheckbox.width + 10,
+                     pruningCheckbox.y + pruningCaption.get_height() / 3))
+
+        screen.blit(transpositionCaption,
+                    (transpositionCheckbox.x + transpositionCheckbox.width + 10,
+                     transpositionCheckbox.y + transpositionCaption.get_height() / 3))
+
+        screen.blit(depthCaption,
+                    (modifyDepthButton.x + modifyDepthButton.width + 10,
+                     modifyDepthButton.y + depthCaption.get_height() / 3))
 
     def buttonResponseToMouseEvent(self, event):
         """
@@ -791,19 +875,26 @@ class SettingsWindow:
         if event.type == pygame.MOUSEMOTION:
             if modifyDepthButton.isOver(event.pos):
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
-                alterButtonAppearance(modifyDepthButton, WHITE, BLACK)
+                alterButtonAppearance(modifyDepthButton, WHITE, BLACK, 4)
             elif pruningCheckbox.isOver(event.pos):
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+            elif transpositionCheckbox.isOver(event.pos):
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
             elif backButton.isOver(event.pos):
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+                self.reloadBackButton(backIconAccent)
             else:
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+                alterButtonAppearance(modifyDepthButton, LIGHTGREY, BLACK)
+                self.reloadBackButton(backIcon)
 
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if modifyDepthButton.isOver(event.pos):
                 alterButtonAppearance(modifyDepthButton, CYAN, BLACK)
             elif pruningCheckbox.isOver(event.pos):
                 self.togglePruningCheckbox()
+            elif transpositionCheckbox.isOver(event.pos):
+                self.toggleTranspositionCheckbox()
             elif backButton.isOver(event.pos):
                 if gameInSession:
                     gameWindow = GameWindow()
@@ -825,6 +916,7 @@ class SettingsWindow:
             engine.BOARD.setDepth(temp)
         self.refreshSettingsMenu()
 
+
 def gradientRect(window, left_colour, right_colour, target_rect, text=None, font='comicsans', fontSize=15):
     """
     Draw a horizontal-gradient filled rectangle covering <target_rect>
@@ -843,14 +935,13 @@ def gradientRect(window, left_colour, right_colour, target_rect, text=None, font
             target_rect.y + (target_rect.height / 2 - text.get_height() / 2)))
 
 
-def alterButtonAppearance(button, color, outline,
+def alterButtonAppearance(button, color, outlineColor, outlineThickness=2,
                           hasGradBackground=False, gradLeftColor=None, gradRightColor=None, fontSize=15):
     """
     Alter button appearance with given colors
-    :param hasGradBackground: Flag which indicates if the button background should be a gradient
     """
     button.color = color
-    thisButton, buttonRect = button.draw(outline)
+    thisButton, buttonRect = button.draw(outline=outlineColor, outlineThickness=outlineThickness)
     if hasGradBackground:
         gradientRect(screen, gradLeftColor, gradRightColor, buttonRect, thisButton.text, 'comicsans', fontSize)
 
