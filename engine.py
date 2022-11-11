@@ -105,8 +105,6 @@ def convertToNumber(twoDimensionalState):
 # the value is
 
 
-# 1 us
-# 0 user
 def check_neigbours(x, y, value, array):
     cost = 0
     map = {}
@@ -120,6 +118,10 @@ def check_neigbours(x, y, value, array):
             else:
                 temp += map[array[x + i][y]]
         if temp > 1:
+            if (value == 1):
+                print(str(temp) + " first cond")
+            else:
+                print("-" + str(temp) + " first cond")
             cost += temp
 
     if y <= 3:
@@ -130,6 +132,10 @@ def check_neigbours(x, y, value, array):
             else:
                 temp += map[array[x][y + i]]
         if temp > 1:
+            if (value == 1):
+                print(str(temp) + " second cond")
+            else:
+                print("-" + str(temp) + " second cond")
             cost += temp
 
     if x <= 2 and y <= 3:
@@ -140,6 +146,10 @@ def check_neigbours(x, y, value, array):
             else:
                 temp += map[array[x + i][y + i]]
         if temp > 1:
+            if (value == 1):
+                print(str(temp) + " third cond")
+            else:
+                print("-" + str(temp) + " third cond")
             cost += temp
 
     if x <= 2 and y >= 3:
@@ -149,7 +159,12 @@ def check_neigbours(x, y, value, array):
                 temp += -50
             else:
                 temp += map[array[x + i][y - i]]
+            print("--"+str(temp)+"---")
         if temp > 1:
+            if (value == 1):
+                print(str(temp) + " fourth cond")
+            else:
+                print("-" + str(temp) + " fourth cond")
             cost += temp
 
     if value == 1:
@@ -159,14 +174,22 @@ def check_neigbours(x, y, value, array):
 
 
 def heuristic(state):
+    print("------------------new state ------------------------")
     array = convertToTwoDimensions(state)
-
+    print(array)
     value = 0
     for i in range(0, 6):
         for j in range(0, 7):
+            print(str(i) + "-" + str(j))
             if array[i][j] != -1:
                 value += check_neigbours(i, j, array[i][j], array)
+    print("----------------------------value is : "+str(value))
     return value
+
+
+# max =1
+# min =0
+# print(heuristic(int("1011100000100100000101110000100111000010100000011110000010100000", 2)))
 
 
 # max =1
