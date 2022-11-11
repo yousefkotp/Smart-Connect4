@@ -106,7 +106,6 @@ def convertToNumber(twoDimensionalState):
 
 
 
-
 def check_neigbours(x, y, value, array):
     if value==1:
         other_player=0
@@ -134,10 +133,7 @@ def check_neigbours(x, y, value, array):
     if y <= 3:
         temp = 0
         for i in range(0, 4):
-            if array[x][y + i] not in map:
-                temp += -50
-            else:
-                temp += map[array[x][y + i]]
+            temp += map[array[x][y + i]]
         if temp > 1:
             if (value == 1):
                 print(str(temp) + " second cond")
@@ -151,10 +147,7 @@ def check_neigbours(x, y, value, array):
     if x <= 2 and y <= 3:
         temp = 0
         for i in range(0, 4):
-            if array[x + i][y + i] not in map:
-                temp += -50
-            else:
-                temp += map[array[x + i][y + i]]
+            temp += map[array[x + i][y + i]]
         if temp > 1:
             if (value == 1):
                 print(str(temp) + " third cond")
@@ -168,10 +161,7 @@ def check_neigbours(x, y, value, array):
     if x <= 2 and y >= 3:
         temp = 0
         for i in range(0, 4):
-            if array[x + i][y - i] not in map:
-                temp += -50
-            else:
-                temp += map[array[x + i][y - i]]
+            temp += map[array[x + i][y - i]]
             print("--"+str(temp)+"---")
         if temp > 1:
             if (value == 1):
@@ -201,6 +191,74 @@ def heuristic(state):
                 value += check_neigbours(i, j, array[i][j], array)
     print("----------------------------value is : "+str(value))
     return value
+
+
+def check_final_score(x,y,value,array):
+    if value == 1:
+        other_player = 0
+    else:
+        other_player = 1
+    cost = 0
+    map = {}
+    map[value] = 1
+    map[-1] = 0
+    map[other_player] = -50
+    if x <= 2:
+        temp = 0
+        for i in range(0, 4):
+            temp += map[array[x + i][y]]
+        if temp == 4:
+            cost+=4
+            # print(str(temp) + " 1 cond")
+
+    if y <= 3:
+        temp = 0
+        for i in range(0, 4):
+            temp += map[array[x][y + i]]
+        if temp == 4:
+            cost+=4
+            # print(str(temp) + " 2 cond")
+
+    if x <= 2 and y <= 3:
+        temp = 0
+        for i in range(0, 4):
+            temp += map[array[x + i][y + i]]
+        if temp ==4 :
+            cost+=4
+            # print(str(temp) + " 3 cond")
+
+    if x <= 2 and y >= 3:
+        temp = 0
+        for i in range(0, 4):
+            temp += map[array[x + i][y - i]]
+        if temp == 4:
+            cost+=temp
+            # print(str(temp) + " fourth cond")
+
+    if value == 1:
+        return cost
+    else:
+        return -cost
+
+
+def get_final_score(state):
+    array = convertToTwoDimensions(state)
+    value=0
+    for i in range(0, 6):
+        for j in range(0, 7):
+            # print(str(i) + "-" + str(j))
+            if array[i][j] != -1:
+                value += check_final_score(i, j, array[i][j], array)
+    return value
+
+
+
+print(get_final_score(int("1011100000100100000101110000100111000010100000001000000101111100", 2)))
+
+# max =1
+# min =0
+print(heuristic(int("1011100000100100000101110000100111000010100000011110000010100000", 2)))
+
 
 
 # max =1
