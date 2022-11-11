@@ -283,11 +283,11 @@ def miniMaxAlphaBeta(maxDepth, depth, isMaxPlayer, state, alpha, beta):
 
 
 def nextMove(alphaBetaPruning, state):  # The function returns the next best state in integer form
-    if state in BOARD.bestMove.keys():
-        return BOARD.bestMove[state]
+    # if state in BOARD.bestMove.keys():
+    #     return BOARD.bestMove[state]
     if alphaBetaPruning:
-        return miniMaxAlphaBeta(5, 0, True, state, -math.inf, math.inf)[0]
-    return miniMax(5, 0, True, state)[0]
+        return miniMaxAlphaBeta(1, 0, True, state, -math.inf, math.inf)[0]
+    return miniMax(1, 0, True, state)[0]
 
 
 # temp = np.full((6, 7), -1, np.int8)
