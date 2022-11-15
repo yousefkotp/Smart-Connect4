@@ -26,7 +26,6 @@ Intelligent Agent to play Connect 4
 ### Exploring Best Moves First
 
 
-
 ## Graphical Interface
 
 

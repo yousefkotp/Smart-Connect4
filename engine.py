@@ -5,12 +5,13 @@ import numpy as np
 # 1: max, 0 min
 
 
+
+
 class Board:
     def __init__(self):
         self.state = 1 << 63
-        self.maxDepth = 1
-        self.mapStates = {}
-        self.bestMove = {}
+        self.maxDepth = 1  
+        self.mapChildren= {}
 
     def getDepth(self):
         return self.maxDepth
@@ -20,7 +21,6 @@ class Board:
 
 
 BOARD = Board()
-
 """
 2- Transpositional Table
 3- Save moves for early game -> first 6 turns
@@ -287,7 +287,7 @@ def miniMax(maxDepth, depth, isMaxPlayer, state):
         return state, get_final_score(state)
     
     children = getChildren(isMaxPlayer, state)
-    BOARD.mapStates[state] = children
+    BOARD.mapChildren[state] =children
     if isMaxPlayer:
         maxChild = None
         maxValue = -math.inf
@@ -296,7 +296,6 @@ def miniMax(maxDepth, depth, isMaxPlayer, state):
             if childValue > maxValue:
                 maxChild = child
                 maxValue = childValue
-        BOARD.bestMove[state] = maxChild
         return maxChild, maxValue
     else:
         minChild = None
@@ -317,7 +316,7 @@ def miniMaxAlphaBeta(maxDepth, depth, isMaxPlayer, state, alpha, beta):
         return state, get_final_score(state)
 
     children = getChildren(isMaxPlayer, state)
-    BOARD.mapStates[state] = children
+    BOARD.mapChildren[state] =children
     if isMaxPlayer:
         maxChild = None
         maxValue = -math.inf
@@ -331,7 +330,6 @@ def miniMaxAlphaBeta(maxDepth, depth, isMaxPlayer, state, alpha, beta):
                 break
             if maxValue > alpha:
                 alpha = maxValue
-        BOARD.bestMove[state] = maxChild
         return maxChild, maxValue
     else:
         minChild = None
@@ -345,15 +343,29 @@ def miniMaxAlphaBeta(maxDepth, depth, isMaxPlayer, state, alpha, beta):
                 break
             if minValue < beta:
                 beta = minValue
+            
         return minChild, minValue
+
+def printTree(state,level):
+    if level== BOARD.maxDepth:
+        return ""
+    if state not in BOARD.mapChildren.keys():
+        return ""
+    ret = "\t"*level+str(heuristic(state))+"\n"
+    for child in BOARD.mapChildren[state]:
+        ret += str(printTree(child,level+1))
+    return ret
 
 
 def nextMove(alphaBetaPruning, state):  # The function returns the next best state in integer form
-    # if state in BOARD.bestMove.keys():
-    #     return BOARD.bestMove[state]
     if alphaBetaPruning:
-        return miniMaxAlphaBeta(BOARD.maxDepth, 0, True, state, -math.inf, math.inf)[0]
-    return miniMax(BOARD.maxDepth, 0, True, state)[0]
+        ans = miniMaxAlphaBeta(BOARD.maxDepth, 0, True, state, -math.inf, math.inf)[0]
+    else:
+        ans =  miniMax(BOARD.maxDepth, 0, True, state)[0]
+    print(printTree(state,0))
+    BOARD.mapChildren.clear()
+    return ans
+    
 
 
 
