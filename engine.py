@@ -12,7 +12,7 @@ class Board:
         self.state = 1 << 63
         self.maxDepth = 1  
         self.mapChildren= {}
-
+        self.mapValues = {}
     def getDepth(self):
         return self.maxDepth
 
@@ -281,10 +281,15 @@ def getChildren(player, state):
 
 def miniMax(maxDepth, depth, isMaxPlayer, state):
     if depth == maxDepth:
-        return state, heuristic(state)
+        value = heuristic(state)
+        BOARD.mapValues[state]= value
+        return state, value
 
     if isGameOver(state):
-        return state, get_final_score(state)
+        value = get_final_score(state)
+        BOARD.mapValues[state]= value
+        return state, value
+
     
     children = getChildren(isMaxPlayer, state)
     BOARD.mapChildren[state] =children
@@ -296,6 +301,7 @@ def miniMax(maxDepth, depth, isMaxPlayer, state):
             if childValue > maxValue:
                 maxChild = child
                 maxValue = childValue
+        BOARD.mapValues[state] = maxValue
         return maxChild, maxValue
     else:
         minChild = None
@@ -305,22 +311,27 @@ def miniMax(maxDepth, depth, isMaxPlayer, state):
             if childValue < minValue:
                 minValue = childValue
                 minChild = child
+        BOARD.mapValues[state] = minValue
         return minChild, minValue
 
 
 def miniMaxAlphaBeta(maxDepth, depth, isMaxPlayer, state, alpha, beta):
     if depth == maxDepth:
-        return state, heuristic(state)
+        value = heuristic(state)
+        BOARD.mapValues[state]= value
+        return state, value
 
     if isGameOver(state):
-        return state, get_final_score(state)
+        value = get_final_score(state)
+        BOARD.mapValues[state]= value
+        return state, value
 
     children = getChildren(isMaxPlayer, state)
-    BOARD.mapChildren[state] =children
+    
     if isMaxPlayer:
         maxChild = None
         maxValue = -math.inf
-
+        index=0
         for child in children:
             childValue = miniMaxAlphaBeta(maxDepth, depth + 1, False, child, alpha, beta)[1]
             if childValue > maxValue:
@@ -330,10 +341,14 @@ def miniMaxAlphaBeta(maxDepth, depth, isMaxPlayer, state, alpha, beta):
                 break
             if maxValue > alpha:
                 alpha = maxValue
+            index+=1
+        BOARD.mapChildren[state] =children[0:index+1]
+        BOARD.mapValues[state] = maxValue
         return maxChild, maxValue
     else:
         minChild = None
         minValue = math.inf
+        index=0
         for child in children:
             childValue = miniMaxAlphaBeta(maxDepth, depth + 1, True, child, alpha, beta)[1]
             if childValue < minValue:
@@ -343,15 +358,15 @@ def miniMaxAlphaBeta(maxDepth, depth, isMaxPlayer, state, alpha, beta):
                 break
             if minValue < beta:
                 beta = minValue
-            
+            index+=1
+        BOARD.mapChildren[state] =children[0:index+1]
+        BOARD.mapValues[state]= minValue
         return minChild, minValue
 
 def printTree(state,level):
     if level== BOARD.maxDepth:
-        return ""
-    if state not in BOARD.mapChildren.keys():
-        return ""
-    ret = "\t"*level+str(heuristic(state))+"\n"
+        return "\t"*level+str(BOARD.mapValues[state])+"\n"
+    ret = "\t"*level+str(BOARD.mapValues[state])+"\n"
     for child in BOARD.mapChildren[state]:
         ret += str(printTree(child,level+1))
     return ret
@@ -364,6 +379,7 @@ def nextMove(alphaBetaPruning, state):  # The function returns the next best sta
         ans =  miniMax(BOARD.maxDepth, 0, True, state)[0]
     print(printTree(state,0))
     BOARD.mapChildren.clear()
+    BOARD.mapValues.clear()
     return ans
     
 
