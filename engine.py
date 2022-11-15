@@ -22,11 +22,9 @@ class Board:
 BOARD = Board()
 
 """
-1- Good heuristic function aka make the function a linear weighted sum of the features
 2- Transpositional Table
 3- Save moves for early game -> first 6 turns
 4- use multi-processing if we can
-5- Enhance the exploring order by exploring best moves first aka moves which places new item near to existing one
 """
 
 
@@ -90,8 +88,6 @@ def convertToNumber(twoDimensionalState):
     return n
 
 
-#
-# print(sys.getsizeof(convertToTwoDimensions(10378549747953762464)))
 
 
 # 3  points for 4 -sure point
@@ -253,13 +249,6 @@ def get_final_score(state):
 
 
 
-print(get_final_score(int("1011100000100100000101110000100111000010100000001000000101111100", 2)))
-
-# max =1
-# min =0
-print(heuristic(int("1011100000100100000101110000100111000010100000011110000010100000", 2)))
-
-
 
 # max =1
 # min =0
@@ -291,9 +280,12 @@ def getChildren(player, state):
     return children
 
 def miniMax(maxDepth, depth, isMaxPlayer, state):
-    if depth == maxDepth or isGameOver(state):
+    if depth == maxDepth:
         return state, heuristic(state)
 
+    if isGameOver(state):
+        return state, get_final_score(state)
+    
     children = getChildren(isMaxPlayer, state)
     BOARD.mapStates[state] = children
     if isMaxPlayer:
@@ -318,8 +310,11 @@ def miniMax(maxDepth, depth, isMaxPlayer, state):
 
 
 def miniMaxAlphaBeta(maxDepth, depth, isMaxPlayer, state, alpha, beta):
-    if depth == maxDepth or isGameOver(state):
+    if depth == maxDepth:
         return state, heuristic(state)
+
+    if isGameOver(state):
+        return state, get_final_score(state)
 
     children = getChildren(isMaxPlayer, state)
     BOARD.mapStates[state] = children
@@ -361,31 +356,8 @@ def nextMove(alphaBetaPruning, state):  # The function returns the next best sta
     return miniMax(BOARD.maxDepth, 0, True, state)[0]
 
 
-# temp = np.full((6, 7), -1, np.int8)
-# print(temp.itemsize)
-# print(temp.size)
-# print(sys.getsizeof(temp))
-
-
-# print(heuristic(12114687404279889984))
-# print("\n")
-# nextState = nextMove(0,12114687404279889984)
-# print(convertToTwoDimensions(nextState))
-# print(heuristic(nextState))
-# print("\n")
-# print(heuristic(12117079941581930560))
-
-
-# getChildren(1, int("1010100000010100000010100000010100000010100000010100000010100000", 2))
-# print((int("1010100000010100000010100000010100000010100000010100000010100000",2)))
-# print(bin(1010100000010100000010100000010100000010100000010100000010100000))
-# print(intoBinary(int("1010100000010100000010100000010100000010100000010100000010100000",2)))
-# DecimalToBinary(int("1010100000010100000010100000010100000010100000010100000010100000",2))
-# print(string)
 
 
 # print(heuristic(int("1011100000100100000101110000100111000010100000011110000010100000", 2)))
-
 # print(heuristic(int("1011100000100100000101110000100111000010100000001000000001000000", 2)))
-# print(sys.getsizeof(convertToTwoDimensions(int("1011100000100100000101110000100111000010100000001000000001000000", 2))))
 # print(heuristic(int("1010100000010100000010100000010100000010100000010100000010100000",2)))
