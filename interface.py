@@ -208,9 +208,9 @@ class GameWindow:
         Refreshes the analysis section
         """
         global statsPanelY
-        if GAME_OVER:
-            statsPanelY = showStatsButton.y + showStatsButton.height + 5
         if GAME_MODE == SINGLE_PLAYER:
+            if GAME_OVER:
+                statsPanelY = showStatsButton.y + showStatsButton.height + 5
             pygame.draw.rect(
                 screen, BLACK,
                 (BOARD_LAYOUT_END_X + 9, statsPanelY + 5, WIDTH - BOARD_LAYOUT_END_X - 18, 267 + (370 - statsPanelY)),
@@ -862,6 +862,7 @@ class TreeVisualizer:
 
         children = engine.BOARD.getChildrenFromMap(root)
 
+        color = GREY
         if children is not None:
             child1 = engine.BOARD.getChildrenFromMap(root)[0]
             if self.isPruned(child1):
@@ -872,6 +873,7 @@ class TreeVisualizer:
         child1Button = Button(window=screen, color=color, x=40, y=rootNodeButton.y + 300, width=140, height=100,
                               text=str(child1Value), shape='ellipse')
 
+        color = GREY
         if children is not None:
             child2 = engine.BOARD.getChildrenFromMap(root)[1]
             if self.isPruned(child2):
@@ -882,6 +884,7 @@ class TreeVisualizer:
         child2Button = Button(window=screen, color=color, x=180, y=rootNodeButton.y + 200, width=140, height=100,
                               text=str(child2Value), shape='ellipse')
 
+        color = GREY
         if children is not None:
             child3 = engine.BOARD.getChildrenFromMap(root)[2]
             if self.isPruned(child3):
@@ -892,6 +895,7 @@ class TreeVisualizer:
         child3Button = Button(window=screen, color=color, x=320, y=rootNodeButton.y + 300, width=140, height=100,
                               text=str(child3Value), shape='ellipse')
 
+        color = GREY
         if children is not None:
             child4 = engine.BOARD.getChildrenFromMap(root)[3]
             if self.isPruned(child4):
@@ -902,6 +906,7 @@ class TreeVisualizer:
         child4Button = Button(window=screen, color=color, x=460, y=rootNodeButton.y + 200, width=140, height=100,
                               text=str(child4Value), shape='ellipse')
 
+        color = GREY
         if children is not None:
             child5 = engine.BOARD.getChildrenFromMap(root)[4]
             if self.isPruned(child5):
@@ -912,6 +917,7 @@ class TreeVisualizer:
         child5Button = Button(window=screen, color=color, x=600, y=rootNodeButton.y + 300, width=140, height=100,
                               text=str(child5Value), shape='ellipse')
 
+        color = GREY
         if children is not None:
             child6 = engine.BOARD.getChildrenFromMap(root)[5]
             if self.isPruned(child6):
@@ -922,6 +928,7 @@ class TreeVisualizer:
         child6Button = Button(window=screen, color=color, x=740, y=rootNodeButton.y + 200, width=140, height=100,
                               text=str(child6Value), shape='ellipse')
 
+        color = GREY
         if children is not None:
             child7 = engine.BOARD.getChildrenFromMap(root)[6]
             if self.isPruned(child7):
