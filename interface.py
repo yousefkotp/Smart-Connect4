@@ -26,7 +26,7 @@ BLACK = (0, 0, 0)
 RED = (230, 30, 30)
 DARKRED = (150, 0, 0)
 GREEN = (30, 230, 30)
-DARKGREEN = (0, 190, 0)
+DARKGREEN = (0, 125, 0)
 BLUE = (30, 30, 122)
 CYAN = (30, 230, 230)
 GOLD = (225, 185, 0)
@@ -60,7 +60,7 @@ BOARD_WIDTH = BOARD_BEGIN_X + COLUMN_COUNT * SQUARE_SIZE
 BOARD_LENGTH = ROW_COUNT * SQUARE_SIZE
 
 #   Player Variables    #
-PIECE_COLORS = (GREY, RED, GREEN)
+PIECE_COLORS = (GREY, GREEN, RED)
 PLAYER1 = 1
 PLAYER2 = 2
 EMPTY_CELL = 0
@@ -428,6 +428,8 @@ class GameWindow:
         if event.type == pygame.MOUSEBUTTONUP:
             if GAME_MODE == SINGLE_PLAYER and showStatsButton.isOver(event.pos):
                 alterButtonAppearance(showStatsButton, LIGHTGREY, BLACK)
+                treevisualizer = TreeVisualizer()
+                treevisualizer.switch()
             elif contributorsButton.isOver(event.pos):
                 alterButtonAppearance(contributorsButton, LIGHTGREY, BLACK)
                 self.showContributors()
@@ -458,6 +460,13 @@ class GameWindow:
         """
         global GAME_OVER, TURN, GAME_BOARD, gameInSession
         gameInSession = True
+
+        # Uncomment the following to make the AI play first
+
+        # if not GAME_OVER:
+        #     switchTurn()
+        #     self.player2Play()
+
         while True:
             pygame.display.update()
             if not GAME_OVER:
@@ -480,7 +489,9 @@ class GameWindow:
                             switchTurn()
                             self.refreshGameWindow()
 
-                            self.player2Play()
+                            if not self.boardIsFull():
+                                self.player2Play()
+
                             if self.boardIsFull():
                                 GAME_OVER = True
                                 pygame.mouse.set_visible(True)
@@ -513,10 +524,9 @@ class GameWindow:
 
         newC = self.getNewMove(newState=newState, oldState=GAME_BOARD)
 
-
         boardLayout = pygame.draw.rect(screen, BOARD_LAYOUT_BACKGROUND,
                                        (0, BOARD_BEGIN_Y - SQUARE_SIZE, BOARD_WIDTH + SQUARE_SIZE / 2, SQUARE_SIZE))
-        for i in range(BOARD_BEGIN_X, math.ceil(BOARD_BEGIN_X + newC * SQUARE_SIZE + SQUARE_SIZE/2), 2):
+        for i in range(BOARD_BEGIN_X, math.ceil(BOARD_BEGIN_X + newC * SQUARE_SIZE + SQUARE_SIZE / 2), 2):
             gradientRect(screen, DARKER_GREY, DARKGREY, boardLayout)
             pygame.draw.circle(
                 screen, PIECE_COLORS[TURN], (i, int(SQUARE_SIZE / 2)), PIECE_RADIUS)
@@ -717,7 +727,7 @@ class MainMenu:
 
 class Button:
     def __init__(self, window, color, x, y, width, height, text='', isChecked=False, gradCore=False, coreLeftColor=None,
-                 coreRightColor=None, gradOutline=False, outLeftColor=None, outRightColor=None):
+                 coreRightColor=None, gradOutline=False, outLeftColor=None, outRightColor=None, shape='rect'):
         self.color = color
         self.x = x
         self.y = y
@@ -732,28 +742,47 @@ class Button:
         self.gradOutline = gradOutline
         self.outLeftColor = outLeftColor
         self.outRightColor = outRightColor
+        self.shape = shape
 
     def draw(self, outline=None, outlineThickness=2, font='comicsans', fontSize=15, fontColor=BLACK):
         """
         Draws the button on screen
         """
-        if outline:
-            rectOutline = pygame.draw.rect(self.screen, outline, (self.x, self.y,
-                                                                  self.width, self.height), 0)
-            if self.gradOutline:
-                gradientRect(self.screen, self.outLeftColor, self.outRightColor, rectOutline)
-        button = pygame.draw.rect(self.screen, self.color, (self.x + outlineThickness, self.y + outlineThickness,
-                                                            self.width - 2 * outlineThickness,
-                                                            self.height - 2 * outlineThickness), 0)
-        if self.gradCore:
-            gradientRect(self.screen, self.coreLeftColor, self.coreRightColor, button, self.text, font, fontSize)
+        if self.shape.lower() == 'rect':
+            if outline:
+                rectOutline = pygame.draw.rect(self.screen, outline, (self.x, self.y,
+                                                                      self.width, self.height), 0)
+                if self.gradOutline:
+                    gradientRect(self.screen, self.outLeftColor, self.outRightColor, rectOutline)
+            button = pygame.draw.rect(self.screen, self.color, (self.x + outlineThickness, self.y + outlineThickness,
+                                                                self.width - 2 * outlineThickness,
+                                                                self.height - 2 * outlineThickness), 0)
+            if self.gradCore:
+                gradientRect(self.screen, self.coreLeftColor, self.coreRightColor, button, self.text, font, fontSize)
 
-        if self.text != '':
-            font = pygame.font.SysFont(font, fontSize)
-            text = font.render(self.text, True, fontColor)
-            self.screen.blit(text, (
-                self.x + (self.width / 2 - text.get_width() / 2), self.y + (self.height / 2 - text.get_height() / 2)))
-
+            if self.text != '':
+                font = pygame.font.SysFont(font, fontSize)
+                text = font.render(self.text, True, fontColor)
+                self.screen.blit(text, (
+                    self.x + (self.width / 2 - text.get_width() / 2),
+                    self.y + (self.height / 2 - text.get_height() / 2)))
+        elif self.shape.lower() == 'ellipse':
+            if outline:
+                rectOutline = pygame.draw.ellipse(self.screen, outline, (self.x, self.y,
+                                                                         self.width, self.height), 0)
+            button = pygame.draw.ellipse(self.screen, self.color, (self.x + outlineThickness, self.y + outlineThickness,
+                                                                   self.width - 2 * outlineThickness,
+                                                                   self.height - 2 * outlineThickness), 0)
+            if self.text != '':
+                font = pygame.font.SysFont(font, fontSize)
+                text = font.render(self.text, True, fontColor)
+                self.screen.blit(text, (
+                    self.x + (self.width / 2 - text.get_width() / 2),
+                    self.y + (self.height / 2 - text.get_height() / 2)))
+        else:
+            button = pygame.draw.circle(self.screen, self.color, (self.x + outlineThickness, self.y + outlineThickness,
+                                                                  self.width - 2 * outlineThickness,
+                                                                  self.height - 2 * outlineThickness), 0)
         return self, button
 
     def isOver(self, pos):
@@ -763,6 +792,183 @@ class Button:
                 return True
 
         return False
+
+
+class TreeVisualizer:
+    def switch(self):
+        self.setupTreeVisualizer()
+        self.show()
+
+    def show(self):
+        while True:
+            pygame.display.update()
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    sys.exit()
+
+                self.buttonResponseToMouseEvent(event)
+
+    def setupTreeVisualizer(self):
+        pygame.display.flip()
+        pygame.display.set_caption('Smart Connect4 :) - Tree Visualizer')
+        self.refreshTreeVisualizer()
+
+    def refreshTreeVisualizer(self):
+        refreshBackground()
+        self.drawTreeNodes()
+        self.drawTreeVisualizerButtons()
+        self.drawMiniGameBoard()
+
+    def drawTreeNodes(self):
+        global parent, root, child1, child2, child3, child4, child5, child6, child7
+
+        parent = Button(window=screen, color=DARKGREY, x=WIDTH / 2 - 70, y=10, width=140, height=100, text='BACK TO PARENT',
+                      shape='ellipse')
+
+        parent.draw(BLACK)
+
+        root = Button(window=screen, color=DARKGREEN, x=WIDTH / 2 - 70, y=parent.y + 200, width=140, height=100, text='80',
+                      shape='ellipse')
+
+        child1 = Button(window=screen, color=DARKGREEN, x=40, y=root.y + 300, width=140, height=100, text='60',
+                        shape='ellipse')
+
+        child2 = Button(window=screen, color=DARKGREEN, x=180, y=root.y + 200, width=140, height=100, text='70',
+                        shape='ellipse')
+
+        child3 = Button(window=screen, color=DARKGREEN, x=320, y=root.y + 300, width=140, height=100, text='8',
+                        shape='ellipse')
+
+        child4 = Button(window=screen, color=DARKGREEN, x=460, y=root.y + 200, width=140, height=100, text='9',
+                        shape='ellipse')
+
+        child5 = Button(window=screen, color=DARKGREEN, x=600, y=root.y + 300, width=140, height=100, text='80',
+                        shape='ellipse')
+
+        child6 = Button(window=screen, color=DARKGREEN, x=740, y=root.y + 200, width=140, height=100, text='12',
+                        shape='ellipse')
+
+        child7 = Button(window=screen, color=DARKGREEN, x=880, y=root.y + 300, width=140, height=100, text='5',
+                        shape='ellipse')
+
+        pygame.draw.rect(screen, WHITE, (root.x + root.width / 2, root.y + root.height + 10, 2, 80))
+        pygame.draw.rect(screen, WHITE,
+                         (root.x + root.width / 2, parent.y + parent.height + 10, 2, 80))
+        horizontalRule = pygame.draw.rect(screen, WHITE,
+                                          (child1.x + child1.width / 2, root.y + root.height + 50,
+                                           WIDTH - (child1.x + child1.width / 2)
+                                           - (WIDTH - (child7.x + child7.width / 2)), 2))
+        pygame.draw.rect(screen, WHITE, (child2.x + child2.width / 2, horizontalRule.y, 2, 40))
+        pygame.draw.rect(screen, WHITE, (child6.x + child6.width / 2, horizontalRule.y, 2, 40))
+        pygame.draw.rect(screen, WHITE, (child1.x + child1.width / 2, horizontalRule.y, 2, 40 + child2.height))
+        pygame.draw.rect(screen, WHITE, (child7.x + child7.width / 2, horizontalRule.y, 2, 40 + child2.height))
+        pygame.draw.rect(screen, WHITE, (child3.x + child3.width / 2, horizontalRule.y, 2, 40 + child2.height))
+        pygame.draw.rect(screen, WHITE, (child5.x + child5.width / 2, horizontalRule.y, 2, 40 + child2.height))
+
+        root.draw()
+        child1.draw()
+        child2.draw()
+        child3.draw()
+        child4.draw()
+        child5.draw()
+        child6.draw()
+        child7.draw()
+
+    def drawMiniGameBoard(self, state=None):
+        """
+        Draws the game board on the interface with the latest values in the board list
+        """
+        if state is not None:
+            gameBoard = engine.convertToTwoDimensions(state=state)
+            gameBoard = np.flip(m=gameBoard, axis=0)
+        else:
+            gameBoard = np.full((ROW_COUNT, COLUMN_COUNT), 0)
+        MINISQUARESIZE = 30
+        MINI_PIECE_RADIUS = MINISQUARESIZE / 2 - 2
+        layout = pygame.draw.rect(surface=screen, color=BLACK, rect=(0, 0, MINISQUARESIZE*7+40, MINISQUARESIZE*6+40))
+        gradientRect(window=screen, left_colour=(40, 40, 40), right_colour=(25, 25, 25), target_rect=layout)
+        pygame.draw.rect(screen, BLACK, (20, 20, MINISQUARESIZE*7, MINISQUARESIZE*6), 0)
+        for c in range(COLUMN_COUNT):
+            for r in range(ROW_COUNT):
+                col = 20 + c * MINISQUARESIZE
+                row = 20 + r * MINISQUARESIZE
+                piece = gameBoard[r][c]
+                pygame.draw.rect(
+                    screen, CELL_BORDER_COLOR, (col, row, MINISQUARESIZE, MINISQUARESIZE))
+                pygame.draw.circle(
+                    screen, PIECE_COLORS[piece],
+                    (int(col + MINISQUARESIZE / 2), int(row + MINISQUARESIZE / 2)), MINI_PIECE_RADIUS)
+        pygame.display.update()
+
+    def drawTreeVisualizerButtons(self):
+        global backButton, backIcon, backIconAccent
+
+        backIconAccent = pygame.image.load('GUI/back-icon.png').convert_alpha()
+        backIcon = pygame.image.load('GUI/back-icon-accent.png').convert_alpha()
+
+        backButton = Button(window=screen, color=(81, 81, 81), x=WIDTH - 70, y=20, width=52, height=52)
+        self.reloadBackButton(backIcon)
+
+    def reloadBackButton(self, icon):
+        backButton.draw()
+        screen.blit(icon, (backButton.x + 2, backButton.y + 2))
+
+    def selectNode(self, nodeIndex):
+        pass
+
+    def draw2DRepresentation(self, state):
+        pass
+
+    def buttonResponseToMouseEvent(self, event):
+
+        if event.type == pygame.MOUSEMOTION:
+            if backButton.isOver(event.pos):
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+                self.reloadBackButton(backIconAccent)
+            elif parent.isOver(event.pos):
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+                parent.draw(WHITE, fontColor=WHITE)
+                pygame.display.update()
+            elif child1.isOver(event.pos):
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+                self.hoverOverNode(child1)
+            elif child2.isOver(event.pos):
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+                self.hoverOverNode(child2)
+            elif child3.isOver(event.pos):
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+                self.hoverOverNode(child3)
+            elif child4.isOver(event.pos):
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+                self.hoverOverNode(child4)
+            elif child5.isOver(event.pos):
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+                self.hoverOverNode(child5)
+            elif child6.isOver(event.pos):
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+                self.hoverOverNode(child6)
+            elif child7.isOver(event.pos):
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+                self.hoverOverNode(child7)
+            else:
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+                self.reloadBackButton(backIcon)
+                self.refreshTreeVisualizer()
+                pygame.display.update()
+
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if backButton.isOver(event.pos):
+                gameWindow = GameWindow()
+                gameWindow.switch()
+
+    def hoverOverNode(self, node):
+        node.color = CYAN
+        node.text = str(int("1011100000100100000101110000100111000010100000011110000010100000", 2))
+        node.draw(fontSize=10)
+        self.drawMiniGameBoard(int(node.text))
+        pygame.display.update()
+
 
 
 class SettingsWindow:
@@ -805,7 +1011,6 @@ class SettingsWindow:
 
         backButton = Button(window=screen, color=(26, 26, 120), x=WIDTH - 70, y=20, width=52, height=52)
         self.reloadBackButton(backIcon)
-
 
         pruningCheckbox = Button(
             screen, color=WHITE,
