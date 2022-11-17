@@ -856,7 +856,7 @@ class TreeVisualizer:
             root = nodeStack[-1]
             rootValue = engine.BOARD.getValueFromMap(root)
 
-        rootNodeButton = Button(window=screen, color=DARKGREEN, x=WIDTH / 2 - 70, y=parentNodeButton.y + 200, width=140,
+        rootNodeButton = Button(window=screen, color=LIGHTGREY, x=WIDTH / 2 - 70, y=parentNodeButton.y + 200, width=140,
                                 height=100, text=str(rootValue),
                                 shape='ellipse')
 
