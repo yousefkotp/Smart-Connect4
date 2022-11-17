@@ -385,9 +385,10 @@ class GameWindow:
         Handles button behaviour in response to mouse events influencing them
         """
         if event.type == pygame.MOUSEMOTION:
-            if GAME_MODE == SINGLE_PLAYER and showStatsButton.isOver(event.pos) and moveMade:
-                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
-                alterButtonAppearance(showStatsButton, WHITE, BLACK)
+            if GAME_MODE == SINGLE_PLAYER and showStatsButton.isOver(event.pos):
+                if moveMade and not GAME_OVER:
+                    pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+                    alterButtonAppearance(showStatsButton, WHITE, BLACK)
             elif contributorsButton.isOver(event.pos):
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
                 alterButtonAppearance(contributorsButton, WHITE, BLACK)
@@ -407,7 +408,7 @@ class GameWindow:
             else:
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
                 if GAME_MODE == SINGLE_PLAYER:
-                    if moveMade:
+                    if moveMade and not GAME_OVER:
                         alterButtonAppearance(showStatsButton, LIGHTGREY, BLACK)
                     else:
                         alterButtonAppearance(showStatsButton, DARKGREY, BLACK)
@@ -418,7 +419,7 @@ class GameWindow:
                     alterButtonAppearance(playAgainButton, GOLD, BLACK)
 
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if GAME_MODE == SINGLE_PLAYER and showStatsButton.isOver(event.pos):
+            if GAME_MODE == SINGLE_PLAYER and not GAME_OVER and showStatsButton.isOver(event.pos):
                 alterButtonAppearance(showStatsButton, CYAN, BLACK)
             elif contributorsButton.isOver(event.pos):
                 alterButtonAppearance(contributorsButton, CYAN, BLACK)
@@ -436,7 +437,7 @@ class GameWindow:
                 settingsWindow.show()
 
         if event.type == pygame.MOUSEBUTTONUP:
-            if GAME_MODE == SINGLE_PLAYER and showStatsButton.isOver(event.pos):
+            if GAME_MODE == SINGLE_PLAYER and not GAME_OVER and showStatsButton.isOver(event.pos):
                 alterButtonAppearance(showStatsButton, LIGHTGREY, BLACK)
                 treevisualizer = TreeVisualizer()
                 treevisualizer.switch()
@@ -934,7 +935,7 @@ class TreeVisualizer:
 
     def navigateNode(self, node, rootNode):
         global root
-        if node is not None:
+        if node is not None and engine.BOARD.getChildrenFromMap(node) is not None:
             nodeStack.append(node)
             self.refreshTreeVisualizer(rootNode)
 
@@ -949,7 +950,8 @@ class TreeVisualizer:
         Draws the game board on the interface with the latest values in the board list
         """
         if state is None:
-            gameBoard = np.full((ROW_COUNT, COLUMN_COUNT), -1)
+            flippedGameBoard = engine.convertToTwoDimensions(state=root)
+            gameBoard = np.flip(m=flippedGameBoard, axis=0)
         else:
             flippedGameBoard = engine.convertToTwoDimensions(state=state)
             gameBoard = np.flip(m=flippedGameBoard, axis=0)
@@ -1001,33 +1003,41 @@ class TreeVisualizer:
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
                 self.reloadBackButton(backIconAccent)
             elif parentNodeButton.isOver(event.pos):
-                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
-                parentNodeButton.draw(WHITE, fontColor=WHITE)
-                pygame.display.update()
+                if len(nodeStack) > 1:
+                    pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+                    parentNodeButton.draw(WHITE, fontColor=WHITE)
+                    pygame.display.update()
             elif rootNodeButton.isOver(event.pos):
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
                 self.hoverOverNode(nodeButton=rootNodeButton, nodeState=root)
             elif child1Button.isOver(event.pos):
-                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
-                self.hoverOverNode(nodeButton=child1Button, nodeState=child1)
+                if child1 is not None:
+                    pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+                    self.hoverOverNode(nodeButton=child1Button, nodeState=child1)
             elif child2Button.isOver(event.pos):
-                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
-                self.hoverOverNode(nodeButton=child2Button, nodeState=child2)
+                if child2 is not None:
+                    pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+                    self.hoverOverNode(nodeButton=child2Button, nodeState=child2)
             elif child3Button.isOver(event.pos):
-                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
-                self.hoverOverNode(nodeButton=child3Button, nodeState=child3)
+                if child3 is not None:
+                    pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+                    self.hoverOverNode(nodeButton=child3Button, nodeState=child3)
             elif child4Button.isOver(event.pos):
-                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
-                self.hoverOverNode(nodeButton=child4Button, nodeState=child4)
+                if child4 is not None:
+                    pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+                    self.hoverOverNode(nodeButton=child4Button, nodeState=child4)
             elif child5Button.isOver(event.pos):
-                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
-                self.hoverOverNode(nodeButton=child5Button, nodeState=child5)
+                if child5 is not None:
+                    pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+                    self.hoverOverNode(nodeButton=child5Button, nodeState=child5)
             elif child6Button.isOver(event.pos):
-                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
-                self.hoverOverNode(nodeButton=child6Button, nodeState=child6)
+                if child6 is not None:
+                    pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+                    self.hoverOverNode(nodeButton=child6Button, nodeState=child6)
             elif child7Button.isOver(event.pos):
-                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
-                self.hoverOverNode(nodeButton=child7Button, nodeState=child7)
+                if child7 is not None:
+                    pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+                    self.hoverOverNode(nodeButton=child7Button, nodeState=child7)
             else:
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
                 self.reloadBackButton(backIcon)
