@@ -78,6 +78,7 @@ gameInSession = False
 moveMade = False
 
 nodeStack = []
+minimaxCurrentMode = "MAX"
 
 #   Game Modes  #
 SINGLE_PLAYER = 1
@@ -471,6 +472,7 @@ class GameWindow:
         """
         global GAME_OVER, TURN, GAME_BOARD, gameInSession, moveMade
         gameInSession = True
+        nodeStack.clear()
 
         # Uncomment the following to make the AI play first
 
@@ -832,6 +834,7 @@ class TreeVisualizer:
         refreshBackground()
         self.drawTreeNodes(rootNode)
         self.drawTreeVisualizerButtons()
+        self.drawTreeVisualizerLabels()
         self.drawMiniGameBoard()
         pygame.display.update()
 
@@ -937,12 +940,14 @@ class TreeVisualizer:
         global root
         if node is not None and engine.BOARD.getChildrenFromMap(node) is not None:
             nodeStack.append(node)
+            self.toggleMinimaxCurrentMode()
             self.refreshTreeVisualizer(rootNode)
 
     def goBackToParent(self):
-        if len(nodeStack) == 1:
+        if len(nodeStack) <= 1:
             return None
         nodeStack.pop()
+        self.toggleMinimaxCurrentMode()
         self.refreshTreeVisualizer(0)
 
     def drawMiniGameBoard(self, state=None):
@@ -985,6 +990,20 @@ class TreeVisualizer:
 
         backButton = Button(window=screen, color=(81, 81, 81), x=WIDTH - 70, y=20, width=52, height=52)
         self.reloadBackButton(backIcon)
+
+    def drawTreeVisualizerLabels(self):
+        labelFont = pygame.font.SysFont("Sans Serif", 55, False, True)
+        modeLabel = labelFont.render(minimaxCurrentMode, True, BLACK)
+        screen.blit(modeLabel,
+                    (rootNodeButton.x + rootNodeButton.width + 20,
+                     rootNodeButton.y + rootNodeButton.height/2 - modeLabel.get_height()/2))
+
+    def toggleMinimaxCurrentMode(self):
+        global minimaxCurrentMode
+        if minimaxCurrentMode == "MAX":
+            minimaxCurrentMode = "MIN"
+        else:
+            minimaxCurrentMode = "MAX"
 
     def reloadBackButton(self, icon):
         backButton.draw()
@@ -1049,7 +1068,6 @@ class TreeVisualizer:
                 gameWindow = GameWindow()
                 gameWindow.switch()
             if parentNodeButton.isOver(event.pos):
-                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
                 self.goBackToParent()
             elif rootNodeButton.isOver(event.pos):
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
