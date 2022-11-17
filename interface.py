@@ -77,6 +77,8 @@ GAME_MODE = -1
 gameInSession = False
 moveMade = False
 
+nodeStack = []
+
 #   Game Modes  #
 SINGLE_PLAYER = 1
 TWO_PLAYERS = 2
@@ -823,76 +825,88 @@ class TreeVisualizer:
     def setupTreeVisualizer(self):
         pygame.display.flip()
         pygame.display.set_caption('Smart Connect4 :) - Tree Visualizer')
-        self.refreshTreeVisualizer()
+        self.refreshTreeVisualizer(rootNode=None)
 
-    def refreshTreeVisualizer(self):
+    def refreshTreeVisualizer(self, rootNode=None):
         refreshBackground()
-        self.drawTreeNodes(parent=None)
+        self.drawTreeNodes(rootNode)
         self.drawTreeVisualizerButtons()
         self.drawMiniGameBoard()
+        pygame.display.update()
 
-    def drawTreeNodes(self, parent, rootIndex=0):
+    def drawTreeNodes(self, parent):
         global parentNodeButton, rootNodeButton, child1Button, child2Button, child3Button, child4Button, child5Button, child6Button, child7Button
-        global parentState, root, child1, child2, child3, child4, child5, child6, child7
+        global root, child1, child2, child3, child4, child5, child6, child7
+        child1 = child2 = child3 = child4 = child5 = child6 = child7 = None
 
-        parentState = parent
         parentNodeButton = Button(window=screen, color=DARKGREY, x=WIDTH / 2 - 70, y=10, width=140, height=100,
                                   text='BACK TO PARENT',
                                   shape='ellipse')
         parentNodeButton.draw(BLACK)
 
         if parent is None:
-            root = engine.parentState
-            rootValue = engine.BOARD.getValueFromMap(engine.parentState)
+            root = engine.preDecisionState
+            nodeStack.append(root)
+            rootValue = engine.BOARD.getValueFromMap(engine.preDecisionState)
         else:
-            root = engine.BOARD.getChildrenFromMap(parent)[rootIndex]
+            root = nodeStack[-1]
             rootValue = engine.BOARD.getValueFromMap(root)
 
         rootNodeButton = Button(window=screen, color=DARKGREEN, x=WIDTH / 2 - 70, y=parentNodeButton.y + 200, width=140,
                                 height=100, text=str(rootValue),
                                 shape='ellipse')
 
-        child1 = engine.BOARD.getChildrenFromMap(root)[0]
+        children = engine.BOARD.getChildrenFromMap(root)
+
+        if children is not None:
+            child1 = engine.BOARD.getChildrenFromMap(root)[0]
         child1Value = engine.BOARD.getValueFromMap(child1)
         child1Button = Button(window=screen, color=DARKGREEN, x=40, y=rootNodeButton.y + 300, width=140, height=100,
                               text=str(child1Value), shape='ellipse')
 
-        child2 = engine.BOARD.getChildrenFromMap(root)[1]
+        if children is not None:
+            child2 = engine.BOARD.getChildrenFromMap(root)[1]
         child2Value = engine.BOARD.getValueFromMap(child2)
         child2Button = Button(window=screen, color=DARKGREEN, x=180, y=rootNodeButton.y + 200, width=140, height=100,
                               text=str(child2Value), shape='ellipse')
 
-        child3 = engine.BOARD.getChildrenFromMap(root)[2]
+        if children is not None:
+            child3 = engine.BOARD.getChildrenFromMap(root)[2]
         child3Value = engine.BOARD.getValueFromMap(child3)
         child3Button = Button(window=screen, color=DARKGREEN, x=320, y=rootNodeButton.y + 300, width=140, height=100,
                               text=str(child3Value), shape='ellipse')
 
-        child4 = engine.BOARD.getChildrenFromMap(root)[3]
+        if children is not None:
+            child4 = engine.BOARD.getChildrenFromMap(root)[3]
         child4Value = engine.BOARD.getValueFromMap(child4)
         child4Button = Button(window=screen, color=DARKGREEN, x=460, y=rootNodeButton.y + 200, width=140, height=100,
                               text=str(child4Value), shape='ellipse')
 
-        child5 = engine.BOARD.getChildrenFromMap(root)[4]
+        if children is not None:
+            child5 = engine.BOARD.getChildrenFromMap(root)[4]
         child5Value = engine.BOARD.getValueFromMap(child5)
         child5Button = Button(window=screen, color=DARKGREEN, x=600, y=rootNodeButton.y + 300, width=140, height=100,
                               text=str(child5Value), shape='ellipse')
 
-        child6 = engine.BOARD.getChildrenFromMap(root)[5]
+        if children is not None:
+            child6 = engine.BOARD.getChildrenFromMap(root)[5]
         child6Value = engine.BOARD.getValueFromMap(child6)
         child6Button = Button(window=screen, color=DARKGREEN, x=740, y=rootNodeButton.y + 200, width=140, height=100,
                               text=str(child6Value), shape='ellipse')
 
-        child7 = engine.BOARD.getChildrenFromMap(root)[6]
+        if children is not None:
+            child7 = engine.BOARD.getChildrenFromMap(root)[6]
         child7Value = engine.BOARD.getValueFromMap(child7)
         child7Button = Button(window=screen, color=DARKGREEN, x=880, y=rootNodeButton.y + 300, width=140, height=100,
                               text=str(child7Value), shape='ellipse')
 
         pygame.draw.rect(screen, WHITE, (
-        rootNodeButton.x + rootNodeButton.width / 2, rootNodeButton.y + rootNodeButton.height + 10, 2, 80))
+            rootNodeButton.x + rootNodeButton.width / 2, rootNodeButton.y + rootNodeButton.height + 10, 2, 80))
         pygame.draw.rect(screen, WHITE,
                          (
-                         rootNodeButton.x + rootNodeButton.width / 2, parentNodeButton.y + parentNodeButton.height + 10,
-                         2, 80))
+                             rootNodeButton.x + rootNodeButton.width / 2,
+                             parentNodeButton.y + parentNodeButton.height + 10,
+                             2, 80))
         horizontalRule = pygame.draw.rect(screen, WHITE,
                                           (child1Button.x + child1Button.width / 2,
                                            rootNodeButton.y + rootNodeButton.height + 50,
@@ -917,6 +931,18 @@ class TreeVisualizer:
         child5Button.draw()
         child6Button.draw()
         child7Button.draw()
+
+    def navigateNode(self, node, rootNode):
+        global root
+        if node is not None:
+            nodeStack.append(node)
+            self.refreshTreeVisualizer(rootNode)
+
+    def goBackToParent(self):
+        if len(nodeStack) == 1:
+            return None
+        nodeStack.pop()
+        self.refreshTreeVisualizer(0)
 
     def drawMiniGameBoard(self, state=None):
         """
@@ -1005,13 +1031,52 @@ class TreeVisualizer:
             else:
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
                 self.reloadBackButton(backIcon)
-                self.refreshTreeVisualizer()
+                self.refreshTreeVisualizer(rootNode=0)
                 pygame.display.update()
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             if backButton.isOver(event.pos):
                 gameWindow = GameWindow()
                 gameWindow.switch()
+            if parentNodeButton.isOver(event.pos):
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+                self.goBackToParent()
+            elif rootNodeButton.isOver(event.pos):
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+                self.hoverOverNode(nodeButton=rootNodeButton, nodeState=root)
+            elif child1Button.isOver(event.pos):
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+                self.hoverOverNode(nodeButton=child1Button, nodeState=child1)
+                self.navigateNode(node=child1, rootNode=root)
+            elif child2Button.isOver(event.pos):
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+                self.hoverOverNode(nodeButton=child2Button, nodeState=child2)
+                self.navigateNode(node=child2, rootNode=root)
+            elif child3Button.isOver(event.pos):
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+                self.hoverOverNode(nodeButton=child3Button, nodeState=child3)
+                self.navigateNode(node=child3, rootNode=root)
+            elif child4Button.isOver(event.pos):
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+                self.hoverOverNode(nodeButton=child4Button, nodeState=child4)
+                self.navigateNode(node=child4, rootNode=root)
+            elif child5Button.isOver(event.pos):
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+                self.hoverOverNode(nodeButton=child5Button, nodeState=child5)
+                self.navigateNode(node=child5, rootNode=root)
+            elif child6Button.isOver(event.pos):
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+                self.hoverOverNode(nodeButton=child6Button, nodeState=child6)
+                self.navigateNode(node=child6, rootNode=root)
+            elif child7Button.isOver(event.pos):
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+                self.hoverOverNode(nodeButton=child7Button, nodeState=child7)
+                self.navigateNode(node=child7, rootNode=root)
+
+            pygame.display.update()
+
+        if event.type == pygame.MOUSEBUTTONUP:
+            pass
 
     def hoverOverNode(self, nodeButton, nodeState=None):
         nodeButton.color = CYAN

@@ -35,7 +35,7 @@ class Board:
 
 
 BOARD = Board()
-parentState = int('1001000000001000000001000000001000000001000000001000000001000000',2)
+preDecisionState = int('1001000000001000000001000000001000000001000000001000000001000000', 2)
 """
 2- Transpositional Table
 3- Save moves for early game -> first 6 turns
@@ -354,7 +354,6 @@ def miniMaxAlphaBeta(maxDepth, depth, isMaxPlayer, state, alpha, beta):
             index += 1
         BOARD.mapChildren[state] = children[0:index + 1]
         BOARD.mapValues[state] = maxValue
-        print('Inserted children for ' + str(state) + '\n' + str(BOARD.mapChildren[state]))
         return maxChild, maxValue
     else:
         minChild = None
@@ -385,12 +384,16 @@ def printTree(state, level):
 
 
 def nextMove(alphaBetaPruning, state):  # The function returns the next best state in integer form
-    global parentState
-    parentState = state
+    global preDecisionState
+    preDecisionState = state
     if alphaBetaPruning:
         ans = miniMaxAlphaBeta(BOARD.maxDepth, 0, True, state, -math.inf, math.inf)[0]
     else:
         ans = miniMax(BOARD.maxDepth, 0, True, state)[0]
+    print('Inserted children for ' + str(state))
+    print(BOARD.mapChildren[state])
+    for child in BOARD.mapChildren[state]:
+        print(str(BOARD.mapValues[child]), end='\t\t\t\t\t\t')
     # print(printTree(state, 0))
     # BOARD.mapChildren.clear()
     # BOARD.mapValues.clear()
