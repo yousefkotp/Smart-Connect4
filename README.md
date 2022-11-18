@@ -1,4 +1,4 @@
-# connect4
+# Connect4
 Intelligent Agent to play Connect-4 with a modifiable depth.
 
 ## Table of Content
@@ -200,6 +200,8 @@ Intelligent Agent to play Connect-4 with a modifiable depth.
 </table>
 
 ## MiniMax Tree Visualizer
+
+![me](https://github.com/adhammohamed1/connect4/blob/main/Tree-Visualizer.gif)
 
 ## Graphical Interface
 ### Landing Interface
