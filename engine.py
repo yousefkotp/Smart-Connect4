@@ -1,4 +1,5 @@
 import math
+import time
 
 import numpy as np
 
@@ -13,6 +14,7 @@ class Board:
         self.mapChildren = {}
         self.mapValues = {}
         self.lastState= None
+        self.numberOfNodesExpanded=0
     def getDepth(self):
         return self.maxDepth
 
@@ -122,57 +124,57 @@ def check_neigbours(x, y, value, array):
         for i in range(0, 4):
             temp += map[array[x + i][y]]
         if temp > 1:
-            if (value == 1):
-                print(str(temp) + " first cond")
-            else:
-                print("-" + str(temp) + " first cond")
+            # if (value == 1):
+            #     print(str(temp) + " first cond")
+            # else:
+            #     print("-" + str(temp) + " first cond")
             cost += temp
         if temp == -47:
             cost -= 1
-            print(" -1 y pasha")
+            # print(" -1 y pasha")
 
     if y <= 3:
         temp = 0
         for i in range(0, 4):
             temp += map[array[x][y + i]]
         if temp > 1:
-            if (value == 1):
-                print(str(temp) + " second cond")
-            else:
-                print("-" + str(temp) + " second cond")
+            # if (value == 1):
+            #     print(str(temp) + " second cond")
+            # else:
+            #     print("-" + str(temp) + " second cond")
             cost += temp
         if temp == -47:
             cost -= 1
-            print(" -1 y pasha")
+            # print(" -1 y pasha")
 
     if x <= 2 and y <= 3:
         temp = 0
         for i in range(0, 4):
             temp += map[array[x + i][y + i]]
         if temp > 1:
-            if (value == 1):
-                print(str(temp) + " third cond")
-            else:
-                print("-" + str(temp) + " third cond")
+            # if (value == 1):
+            #     print(str(temp) + " third cond")
+            # else:
+            #     print("-" + str(temp) + " third cond")
             cost += temp
         if temp == -47:
             cost -= 1
-            print(" -1 y pasha")
+            # print(" -1 y pasha")
 
     if x <= 2 and y >= 3:
         temp = 0
         for i in range(0, 4):
             temp += map[array[x + i][y - i]]
-            print("--" + str(temp) + "---")
+            # print("--" + str(temp) + "---")
         if temp > 1:
-            if (value == 1):
-                print(str(temp) + " fourth cond")
-            else:
-                print("-" + str(temp) + " fourth cond")
+            # if (value == 1):
+            #     print(str(temp) + " fourth cond")
+            # else:
+            #     print("-" + str(temp) + " fourth cond")
             cost += temp
         if temp == -47:
             cost -= 1
-            print(" -2 y pasha")
+            # print(" -2 y pasha")
 
     if value == 1:
         return cost
@@ -181,16 +183,15 @@ def check_neigbours(x, y, value, array):
 
 
 def heuristic(state):
-    print("------------------new state ------------------------")
+    # print("------------------new state ------------------------")
     array = convertToTwoDimensions(state)
-    print(array)
     value = 0
     for i in range(0, 6):
         for j in range(0, 7):
-            print(str(i) + "-" + str(j))
+            # print(str(i) + "-" + str(j))
             if array[i][j] != -1:
                 value += check_neigbours(i, j, array[i][j], array)
-    print("----------------------------value is : " + str(value))
+    # print("----------------------------value is : " + str(value))
     return value
 
 
@@ -255,7 +256,6 @@ def get_final_score(state):
 
 # max =1
 # min =0
-# print(heuristic(int("1011100000100100000101110000100111000010100000011110000010100000", 2)))
 
 def getChildren(player, state):
     list = [33, 42, 24, 51, 15, 60, 6]
@@ -282,6 +282,7 @@ def getChildren(player, state):
 
 
 def miniMax(maxDepth, depth, isMaxPlayer, state):
+    BOARD.numberOfNodesExpanded+=1
     if depth == maxDepth:
         value = heuristic(state)
         BOARD.mapValues[state] = value
@@ -317,6 +318,7 @@ def miniMax(maxDepth, depth, isMaxPlayer, state):
 
 
 def miniMaxAlphaBeta(maxDepth, depth, isMaxPlayer, state, alpha, beta):
+    BOARD.numberOfNodesExpanded+=1
     if depth == maxDepth:
         value = heuristic(state)
         BOARD.mapValues[state] = value
@@ -370,7 +372,13 @@ def miniMaxAlphaBeta(maxDepth, depth, isMaxPlayer, state, alpha, beta):
 
 
 def nextMove(alphaBetaPruning, state):  # The function returns the next best state in integer form
+    start_time = time.time()
+    BOARD.numberOfNodesExpanded=0
     BOARD.lastState= state
     if alphaBetaPruning:
-        return miniMaxAlphaBeta(BOARD.maxDepth, 0, True, state, -math.inf, math.inf)[0]
-    return miniMax(BOARD.maxDepth, 0, True, state)[0]
+        ans= miniMaxAlphaBeta(BOARD.maxDepth, 0, True, state, -math.inf, math.inf)[0]
+    else:
+        ans =miniMax(BOARD.maxDepth, 0, True, state)[0]
+    print(BOARD.numberOfNodesExpanded)
+    print(time.time()-start_time)
+    return ans

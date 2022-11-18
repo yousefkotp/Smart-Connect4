@@ -292,9 +292,9 @@ class GameWindow:
         """
         Prints the game board to the terminal
         """
-        print('\n-\n' +
-              str(GAME_BOARD) +
-              '\n Player ' + str(TURN) + ' plays next')
+        # print('\n-\n' +
+        #       str(GAME_BOARD) +
+        #       '\n Player ' + str(TURN) + ' plays next')
 
     def drawGameBoard(self):
         """

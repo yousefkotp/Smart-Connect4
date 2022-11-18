@@ -12,10 +12,10 @@ Intelligent Agent to play Connect 4
     + [Heuristic Pruning](#heuristic-pruning)
     + [Alpha-Beta Pruning](#alpha-beta-pruning)
     + [Exploring Best Moves First](#exploring-best-moves-first)
-  * [MiniMax Tree Visualizer](#minimax-tree-visualizer)
   * [Analysis for Runtime](#analysis-for-runtime)
     + [Without Pruning](#without-pruning)
     + [With Pruning](#with-pruning)
+  * [MiniMax Tree Visualizer](#minimax-tree-visualizer)
   * [Graphical Interface](#graphical-interface)
   * [Contributors](#contributors)
 
@@ -80,20 +80,84 @@ Function MiniMax(maxDepth, currentDepth, isMaxPlayer, state)
 ### Alpha-Beta Pruning
 
 ### Exploring Best Moves First
+- A lot of research regarding the connect-4 game has shown that playing in the middle or near the middle enhances the chances of winning the game, playing in the middle is considered in a lot of time the best choice.
+- Exploring a state where we place a piece in the middle firstly has enhanced the alpha-beta pruning quite well especially in early game.
 
+## Analysis for Runtime
+- The following anlaysis is done on some random states, so the numbers can varies from one state to another in case of pruning.
+- The time is measured in seconds.
+### Without Pruning
+<table align="center">
+  <tr>
+    <th>Depth</th>
+    <th>States Expanded</th>
+    <th>Time Taken</th>
+
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>8</td>
+    <td>0.001</td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td>57</td>
+    <td>0.007</td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td>400</td>
+    <td>0.069</td>
+  </tr>
+  <tr>
+    <td>4</td>
+    <td>2775</td>
+    <td>0.521</td>
+  </tr>
+  <tr>
+    <td>5</td>
+    <td>19608</td>
+    <td>3.01</td>
+  </tr>
+</table>
+
+### With Pruning
+ <tr>
+    <th>Depth</th>
+    <th>States Expanded</th>
+    <th>Time Taken</th>
+
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>8</td>
+    <td>0.001</td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td>27</td>
+    <td>0.005</td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td>84</td>
+    <td>0.013</td>
+  </tr>
+  <tr>
+    <td>4</td>
+    <td>235</td>
+    <td>0.115</td>
+  </tr>
+  <tr>
+    <td>5</td>
+    <td>1111</td>
+    <td>0.645</td>
+  </tr>
+</table>
 
 ## MiniMax Tree Visualizer
 
-
-## Analysis for Runtime
-
-### Without Pruning
-<!-- time taken and node expanded for different depths -->
-### With Pruning
-
-
 ## Graphical Interface
-
 
 ## Contributors
 
