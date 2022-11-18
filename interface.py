@@ -870,8 +870,11 @@ class TreeVisualizer:
             else:
                 color = DARKGREEN
         child1Value = engine.BOARD.getValueFromMap(child1)
+        txt = str(child1Value)
+        if child1Value is None:
+            txt = '*PRUNED*'
         child1Button = Button(window=screen, color=color, x=40, y=rootNodeButton.y + 300, width=140, height=100,
-                              text=str(child1Value), shape='ellipse')
+                              text=txt, shape='ellipse')
 
         color = GREY
         if children is not None and len(children) >= 2:
@@ -881,8 +884,11 @@ class TreeVisualizer:
             else:
                 color = DARKGREEN
         child2Value = engine.BOARD.getValueFromMap(child2)
+        txt = str(child2Value)
+        if child2Value is None:
+            txt = '*PRUNED*'
         child2Button = Button(window=screen, color=color, x=180, y=rootNodeButton.y + 200, width=140, height=100,
-                              text=str(child2Value), shape='ellipse')
+                              text=txt, shape='ellipse')
 
         color = GREY
         if children is not None and len(children) >= 3:
@@ -892,8 +898,11 @@ class TreeVisualizer:
             else:
                 color = DARKGREEN
         child3Value = engine.BOARD.getValueFromMap(child3)
+        txt = str(child3Value)
+        if child3Value is None:
+            txt = '*PRUNED*'
         child3Button = Button(window=screen, color=color, x=320, y=rootNodeButton.y + 300, width=140, height=100,
-                              text=str(child3Value), shape='ellipse')
+                              text=txt, shape='ellipse')
 
         color = GREY
         if children is not None and len(children) >= 4:
@@ -903,8 +912,11 @@ class TreeVisualizer:
             else:
                 color = DARKGREEN
         child4Value = engine.BOARD.getValueFromMap(child4)
+        txt = str(child4Value)
+        if child4Value is None:
+            txt = '*PRUNED*'
         child4Button = Button(window=screen, color=color, x=460, y=rootNodeButton.y + 200, width=140, height=100,
-                              text=str(child4Value), shape='ellipse')
+                              text=txt, shape='ellipse')
 
         color = GREY
         if children is not None and len(children) >= 5:
@@ -914,8 +926,11 @@ class TreeVisualizer:
             else:
                 color = DARKGREEN
         child5Value = engine.BOARD.getValueFromMap(child5)
+        txt = str(child5Value)
+        if child5Value is None:
+            txt = '*PRUNED*'
         child5Button = Button(window=screen, color=color, x=600, y=rootNodeButton.y + 300, width=140, height=100,
-                              text=str(child5Value), shape='ellipse')
+                              text=txt, shape='ellipse')
 
         color = GREY
         if children is not None and len(children) >= 6:
@@ -925,8 +940,11 @@ class TreeVisualizer:
             else:
                 color = DARKGREEN
         child6Value = engine.BOARD.getValueFromMap(child6)
+        txt = str(child6Value)
+        if child6Value is None:
+            txt = '*PRUNED*'
         child6Button = Button(window=screen, color=color, x=740, y=rootNodeButton.y + 200, width=140, height=100,
-                              text=str(child6Value), shape='ellipse')
+                              text=txt, shape='ellipse')
 
         color = GREY
         if children is not None and len(children) >= 7:
@@ -936,8 +954,11 @@ class TreeVisualizer:
             else:
                 color = DARKGREEN
         child7Value = engine.BOARD.getValueFromMap(child7)
+        txt = str(child7Value)
+        if child7Value is None:
+            txt = '*PRUNED*'
         child7Button = Button(window=screen, color=color, x=880, y=rootNodeButton.y + 300, width=140, height=100,
-                              text=str(child7Value), shape='ellipse')
+                              text=txt, shape='ellipse')
 
         pygame.draw.rect(screen, WHITE, (
             rootNodeButton.x + rootNodeButton.width / 2, rootNodeButton.y + rootNodeButton.height + 10, 2, 80))
@@ -1157,7 +1178,6 @@ class TreeVisualizer:
         nodeButton.text = str(nodeState)
         if nodeState is not None and self.isPruned(nodeState):
             nodeButton.color = RED
-            nodeButton.text = '*PRUNED*'
         nodeButton.draw(fontSize=10)
         self.drawMiniGameBoard(nodeState)
         pygame.display.update()
