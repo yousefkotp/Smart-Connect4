@@ -1,16 +1,17 @@
 # connect4
-Intelligent Agent to play Connect 4
+Intelligent Agent to play Connect-4 with a modifiable depth.
 
 ## Table of Content
 - [connect4](#connect4)
+  * [Table of Content](#table-of-content)
   * [Deployment](#deployment)
-  * [Actions and States](#actions-and-states)
   * [State Representation](#state-representation)
   * [MiniMax Algorithm](#minimax-algorithm)
   * [Data Structures Used](#data-structures-used)
   * [Optimizations](#optimizations)
     + [Heuristic Pruning](#heuristic-pruning)
     + [Alpha-Beta Pruning](#alpha-beta-pruning)
+      - [Pseudocode](#pseudocode)
     + [Exploring Best Moves First](#exploring-best-moves-first)
   * [Analysis for Runtime](#analysis-for-runtime)
     + [Without Pruning](#without-pruning)
@@ -18,7 +19,6 @@ Intelligent Agent to play Connect 4
   * [MiniMax Tree Visualizer](#minimax-tree-visualizer)
   * [Graphical Interface](#graphical-interface)
   * [Contributors](#contributors)
-
 ## Deployment
 
 - The project was built using [Python 3.9](https://www.python.org/downloads/release/python-390/), make sure you configure your python interpreter correctly
@@ -35,7 +35,7 @@ Intelligent Agent to play Connect 4
     - A 6 bits representing each slot inside that column, 0 for the human and 1 for the intelligent agent.
     - The 64th bit indicates whether the state is pruned or not, it is only useful when printing the search tree so we can neglect it in most of our operations (check the [Alpha Beta Pruning](#alpha-beta-pruning) section for a better understanding).
 - We can conclude from the previous representation that an empty board will be represented as the bits:
-    > 1001000000001000000001000000001000000001000000001000000001000000
+    > 1 001000000 001000000 001000000 001000000 001000000 001000000 001000000
 - Those bits are equal to the number "10378549747928563776" in decimal.
 
 - Actions are implemented by incrementing the last location mask of every column and upating the bit corresponding to that slot.
@@ -44,30 +44,30 @@ Intelligent Agent to play Connect 4
 ## MiniMax Algorithm
 
 - MiniMax Algorihm Pseudocode:
-```python
-Function MiniMax(maxDepth, currentDepth, isMaxPlayer, state)
-    if currentDepth == maxDepth
-        return state,heuristic(state)
-    if isGameOver(state)
-        return state,getFinalScore(state)
-    
-    children = getChilder(state)
-    if isMaxPlayer // if it is the agent's turn
-        Initialize maxChild, maxValue with negative infinity
-        for child in children
-            childValue = MiniMax(maxDepth,currentDepth+1, not isMaxPlayer, child)[1]
-            if childValue > maxValue
-                maxChild = child, maxValue = childValue
-        return maxChild, maxValue
-    else
-        Initialize minChild, minValue with positive infinity
-        for child in children
-            childValue = MiniMax(maxDepth,currentDepth+1, not isMaxPlayer, child)[1]
-            if childValue < minValue
-                minChild = child, minValue = childValue
-        return minChild, minValue
+    ```python
+    Function MiniMax(maxDepth, currentDepth, isMaxPlayer, state)
+        if currentDepth == maxDepth
+            return state,heuristic(state)
+        if isGameOver(state)
+            return state,getFinalScore(state)
+        
+        children = getChilder(state)
+        if isMaxPlayer // if it is the agent's turn
+            Initialize maxChild, maxValue with negative infinity
+            for child in children
+                childValue = MiniMax(maxDepth,currentDepth+1, not isMaxPlayer, child)[1]
+                if childValue > maxValue
+                    maxChild = child, maxValue = childValue
+            return maxChild, maxValue
+        else
+            Initialize minChild, minValue with positive infinity
+            for child in children
+                childValue = MiniMax(maxDepth,currentDepth+1, not isMaxPlayer, child)[1]
+                if childValue < minValue
+                    minChild = child, minValue = childValue
+            return minChild, minValue
 
-```
+    ```
 ## Data Structures Used
 - Hash map to map from states to its children (next states).
 - Hash map to map from states to its values.
@@ -78,7 +78,46 @@ Function MiniMax(maxDepth, currentDepth, isMaxPlayer, state)
 ### Heuristic Pruning
 
 ### Alpha-Beta Pruning
+- Alpha-Beta pruning is a modified version of the minimax algorithm to optimize it.
+- Alpha-Beta can be a real game changer, it cannot eliminate the exponent, but it can cuts it to half.
+- Alpha-Beta Pruning can -without checking each node of the game tree- compute the correct minimax decision. This involves two threshold parameter Alpha and beta for future expansion, so it is called alpha-beta pruning.
+    * Alpha: The best (highest-value) choice we have found so far at any point along the path of Maximizer. The initial value of alpha is -∞.
+    * Beta: The best (lowest-value) choice we have found so far at any point along the path of Minimizer. The initial value of beta is +∞.
+- The condition for the pruning is: α>=β 
+> Alpha is only updated by Max Player, while Beta is only updated by Min player.
+#### Pseudocode
+    ```python
+    Function MiniMaxAlphaBeta(maxDepth, currentDepth, isMaxPlayer, state, alpha,beta)
+        if currentDepth == maxDepth
+            return state,heuristic(state)
+        if isGameOver(state)
+            return state,getFinalScore(state)
+        
+        children = getChilder(state)
+        if isMaxPlayer // if it is the agent's turn
+            Initialize maxChild, maxValue with negative infinity
+            for child in children
+                childValue = MiniMax(maxDepth,currentDepth+1, not isMaxPlayer, child)[1]
+                if childValue > maxValue
+                    maxChild = child, maxValue = childValue
+                if maxValue > alpha:
+                    alpha = maxValue
+                if alpha >= beta:
+                    break
+            return maxChild, maxValue
+        else
+            Initialize minChild, minValue with positive infinity
+            for child in children
+                childValue = MiniMax(maxDepth,currentDepth+1, not isMaxPlayer, child)[1]
+                if childValue < minValue
+                    minChild = child, minValue = childValue
+                if minValue < beta:
+                    beta = minValue
+                if beta <= alpha:
+                    break
+            return minChild, minValue
 
+    ```
 ### Exploring Best Moves First
 - A lot of research regarding the connect-4 game has shown that playing in the middle or near the middle enhances the chances of winning the game, playing in the middle is considered in a lot of time the best choice.
 - Exploring a state where we place a piece in the middle firstly has enhanced the alpha-beta pruning quite well especially in early game.
@@ -86,6 +125,7 @@ Function MiniMax(maxDepth, currentDepth, isMaxPlayer, state)
 ## Analysis for Runtime
 - The following anlaysis is done on some random states, so the numbers can varies from one state to another in case of pruning.
 - The time is measured in seconds.
+
 ### Without Pruning
 <table align="center">
   <tr>
