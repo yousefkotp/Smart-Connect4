@@ -971,11 +971,31 @@ class TreeVisualizer:
         child6Button.draw()
         child7Button.draw()
 
-    def navigateNode(self, node, rootNode):
+    def navigateNode(self, node, rootNode, nodeButton):
         global root
         if node is not None and engine.BOARD.getChildrenFromMap(node) is not None:
             nodeStack.append(node)
             self.toggleMinimaxCurrentMode()
+
+            rootY, nodeY = rootNodeButton.y, nodeButton.y
+            rootX, nodeX = rootNodeButton.x, nodeButton.x
+            while nodeX not in range(int(rootX) - 3, int(rootX) + 3) \
+                    or nodeY not in range(int(rootY) - 3, int(rootY) + 3):
+                if nodeX < rootX:
+                    nodeX += 2
+                elif nodeX > rootX:
+                    nodeX -= 2
+                if nodeY > rootY:
+                    nodeY -= 2
+                color = DARKGREEN
+                if math.sqrt(pow(rootX - nodeX, 2) + pow(rootY - nodeY, 2)) <= 200:
+                    color = LIGHTGREY
+                tempNodeButton = Button(window=screen, color=color, x=nodeX, y=nodeY, width=140, height=100,
+                                        text=nodeButton.text, shape='ellipse')
+                refreshBackground()
+                tempNodeButton.draw()
+                pygame.display.update()
+            pygame.time.wait(100)
             self.refreshTreeVisualizer(rootNode)
 
     def goBackToParent(self):
@@ -983,6 +1003,19 @@ class TreeVisualizer:
             return None
         nodeStack.pop()
         self.toggleMinimaxCurrentMode()
+
+        rootY, parentY = rootNodeButton.y, parentNodeButton.y
+        rootX = rootNodeButton.x
+        while rootY not in range(int(parentY) - 3, int(parentY) + 3):
+            if rootY > parentY:
+                rootY -= 3
+            color = DARKGREEN
+            tempRootButton = Button(window=screen, color=color, x=rootX, y=rootY, width=140, height=100,
+                                    text=rootNodeButton.text, shape='ellipse')
+            refreshBackground()
+            tempRootButton.draw()
+            pygame.display.update()
+        pygame.time.wait(100)
         self.refreshTreeVisualizer(0)
 
     def drawMiniGameBoard(self, state=None):
@@ -1100,19 +1133,19 @@ class TreeVisualizer:
             if parentNodeButton.isOver(event.pos):
                 self.goBackToParent()
             elif child1Button.isOver(event.pos) and not self.isPruned(int(child1Button.text)):
-                self.navigateNode(node=child1, rootNode=root)
+                self.navigateNode(node=child1, rootNode=root, nodeButton=child1Button)
             elif child2Button.isOver(event.pos) and not self.isPruned(int(child2Button.text)):
-                self.navigateNode(node=child2, rootNode=root)
+                self.navigateNode(node=child2, rootNode=root, nodeButton=child2Button)
             elif child3Button.isOver(event.pos) and not self.isPruned(int(child3Button.text)):
-                self.navigateNode(node=child3, rootNode=root)
+                self.navigateNode(node=child3, rootNode=root, nodeButton=child3Button)
             elif child4Button.isOver(event.pos) and not self.isPruned(int(child4Button.text)):
-                self.navigateNode(node=child4, rootNode=root)
+                self.navigateNode(node=child4, rootNode=root, nodeButton=child4Button)
             elif child5Button.isOver(event.pos) and not self.isPruned(int(child5Button.text)):
-                self.navigateNode(node=child5, rootNode=root)
+                self.navigateNode(node=child5, rootNode=root, nodeButton=child5Button)
             elif child6Button.isOver(event.pos) and not self.isPruned(int(child6Button.text)):
-                self.navigateNode(node=child6, rootNode=root)
+                self.navigateNode(node=child6, rootNode=root, nodeButton=child6Button)
             elif child7Button.isOver(event.pos) and not self.isPruned(int(child7Button.text)):
-                self.navigateNode(node=child7, rootNode=root)
+                self.navigateNode(node=child7, rootNode=root, nodeButton=child7Button)
 
             pygame.display.update()
 
@@ -1224,7 +1257,6 @@ class SettingsWindow:
         titleFont = pygame.font.SysFont("Sans Serif", 65, False, True)
         subTitleFont = pygame.font.SysFont("Sans Serif", 50, False, True)
         captionFont1_Arial = pygame.font.SysFont("Arial", 16)
-        captionFont1_SansSerif = pygame.font.SysFont("Sans Serif", 16)
         captionFont2_Arial = pygame.font.SysFont("Arial", 23)
         captionFont2_SansSerif = pygame.font.SysFont("Sans Serif", 23)
 
