@@ -849,9 +849,9 @@ class TreeVisualizer:
         parentNodeButton.draw(BLACK)
 
         if parent is None:
-            root = engine.preDecisionState
+            root = engine.BOARD.lastState
             nodeStack.append(root)
-            rootValue = engine.BOARD.getValueFromMap(engine.preDecisionState)
+            rootValue = engine.BOARD.getValueFromMap(engine.BOARD.lastState)
         else:
             root = nodeStack[-1]
             rootValue = engine.BOARD.getValueFromMap(root)

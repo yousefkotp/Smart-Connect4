@@ -8,11 +8,11 @@ import numpy as np
 
 class Board:
     def __init__(self):
-        self.state = 1 << 63
+        self.state = 10378549747928563776 #Corresponding to 1001000000001000000001000000001000000001000000001000000001000000
         self.maxDepth = 1
         self.mapChildren = {}
         self.mapValues = {}
-
+        self.lastState= None
     def getDepth(self):
         return self.maxDepth
 
@@ -35,13 +35,6 @@ class Board:
 
 
 BOARD = Board()
-preDecisionState = int('1001000000001000000001000000001000000001000000001000000001000000', 2)
-"""
-2- Transpositional Table
-3- Save moves for early game -> first 6 turns
-4- use multi-processing if we can
-"""
-
 
 def set_bit(value, bit):
     return value | (1 << bit)
@@ -266,7 +259,6 @@ def get_final_score(state):
 
 def getChildren(player, state):
     list = [33, 42, 24, 51, 15, 60, 6]
-    # k = 60
     children = []
     for i in range(0, 7):
         k = list[i]
@@ -286,7 +278,6 @@ def getChildren(player, state):
             temp_state = clear_bit(temp_state, k + 2)
             temp_state = temp_state | ((temp + 1) << k)
             children.append(temp_state)
-        # k -= 9
     return children
 
 
@@ -337,7 +328,6 @@ def miniMaxAlphaBeta(maxDepth, depth, isMaxPlayer, state, alpha, beta):
         return state, value
 
     children = getChildren(isMaxPlayer, state)
-
     if isMaxPlayer:
         maxChild = None
         maxValue = -math.inf
@@ -351,9 +341,11 @@ def miniMaxAlphaBeta(maxDepth, depth, isMaxPlayer, state, alpha, beta):
                 break
             if maxValue > alpha:
                 alpha = maxValue
-            index += 1
-        BOARD.mapChildren[state] = children[0:index + 1]
+            index += 1    
+        for i in range(index+1,len(children)):
+            children[i]= clear_bit(children[i],63)
         BOARD.mapValues[state] = maxValue
+        BOARD.mapChildren[state] =children
         return maxChild, maxValue
     else:
         minChild = None
@@ -369,36 +361,16 @@ def miniMaxAlphaBeta(maxDepth, depth, isMaxPlayer, state, alpha, beta):
             if minValue < beta:
                 beta = minValue
             index += 1
-        BOARD.mapChildren[state] = children[0:index + 1]
+        for i in range(index+1,len(children)):
+            children[i]= clear_bit(children[i],63)
         BOARD.mapValues[state] = minValue
+        BOARD.mapChildren[state] =children
         return minChild, minValue
 
 
-def printTree(state, level):
-    if level == BOARD.maxDepth:
-        return "\t" * level + str(BOARD.mapValues[state]) + "\n"
-    ret = "\t" * level + str(BOARD.mapValues[state]) + "\n"
-    for child in BOARD.mapChildren[state]:
-        ret += str(printTree(child, level + 1))
-    return ret
-
 
 def nextMove(alphaBetaPruning, state):  # The function returns the next best state in integer form
-    global preDecisionState
-    preDecisionState = state
+    BOARD.lastState= state
     if alphaBetaPruning:
-        ans = miniMaxAlphaBeta(BOARD.maxDepth, 0, True, state, -math.inf, math.inf)[0]
-    else:
-        ans = miniMax(BOARD.maxDepth, 0, True, state)[0]
-    print('Inserted children for ' + str(state))
-    print(BOARD.mapChildren[state])
-    for child in BOARD.mapChildren[state]:
-        print(str(BOARD.mapValues[child]), end='\t\t\t\t\t\t')
-    # print(printTree(state, 0))
-    # BOARD.mapChildren.clear()
-    # BOARD.mapValues.clear()
-    return ans
-
-# print(heuristic(int("1011100000100100000101110000100111000010100000011110000010100000", 2)))
-# print(heuristic(int("1011100000100100000101110000100111000010100000001000000001000000", 2)))
-# print(heuristic(int("1010100000010100000010100000010100000010100000010100000010100000",2)))
+        return miniMaxAlphaBeta(BOARD.maxDepth, 0, True, state, -math.inf, math.inf)[0]
+    return miniMax(BOARD.maxDepth, 0, True, state)[0]

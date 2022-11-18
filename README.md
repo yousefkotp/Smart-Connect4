@@ -15,7 +15,13 @@ Intelligent Agent to play Connect 4
 
 ## State Representation
 
+
+
 ## MiniMax Algorithm
+
+
+## Data Structures Used
+
 
 ## Optimizations
 
@@ -24,6 +30,16 @@ Intelligent Agent to play Connect 4
 ### Alpha-Beta Pruning
 
 ### Exploring Best Moves First
+
+
+## MiniMax Tree Visualizer
+
+
+## Analysis for Runtime
+### Without Pruning
+<!-- time taken and node expanded for different depths -->
+### With Pruning
+
 
 
 ## Graphical Interface
