@@ -3,7 +3,6 @@ Intelligent Agent to play Connect-4 with a modifiable depth.
 
 ## Table of Content
 - [connect4](#connect4)
-  * [Table of Content](#table-of-content)
   * [Deployment](#deployment)
   * [State Representation](#state-representation)
   * [MiniMax Algorithm](#minimax-algorithm)
