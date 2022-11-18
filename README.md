@@ -46,7 +46,7 @@ Intelligent Agent to play Connect-4 with a modifiable depth.
 ## MiniMax Algorithm
 
 - MiniMax Algorihm Pseudocode:
-```python
+  ```python
     Function MiniMax(maxDepth, currentDepth, isMaxPlayer, state)
         if currentDepth == maxDepth
             return state,heuristic(state)
@@ -68,8 +68,7 @@ Intelligent Agent to play Connect-4 with a modifiable depth.
                 if childValue < minValue
                     minChild = child, minValue = childValue
             return minChild, minValue
-
-```
+  ```
 ## Data Structures Used
 - Hash map to map from states to its children (next states).
 - Hash map to map from states to its values.
@@ -88,7 +87,8 @@ Intelligent Agent to play Connect-4 with a modifiable depth.
 - The condition for the pruning is: α>=β 
 > Alpha is only updated by Max Player, while Beta is only updated by Min player.
 #### Pseudocode
-    ```python
+
+  ```python
     Function MiniMaxAlphaBeta(maxDepth, currentDepth, isMaxPlayer, state, alpha,beta)
         if currentDepth == maxDepth
             return state,heuristic(state)
@@ -119,7 +119,7 @@ Intelligent Agent to play Connect-4 with a modifiable depth.
                     break
             return minChild, minValue
 
-    ```
+  ```
 ### Exploring Best Moves First
 - A lot of research regarding the connect-4 game has shown that playing in the middle or near the middle enhances the chances of winning the game, playing in the middle is considered in a lot of time the best choice.
 - Exploring a state where we place a piece in the middle firstly has enhanced the alpha-beta pruning quite well especially in early game.
