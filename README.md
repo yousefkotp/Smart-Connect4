@@ -46,7 +46,7 @@ Intelligent Agent to play Connect-4 with a modifiable depth.
 ## MiniMax Algorithm
 
 - MiniMax Algorihm Pseudocode:
-    ```python
+  ```python
     Function MiniMax(maxDepth, currentDepth, isMaxPlayer, state)
         if currentDepth == maxDepth
             return state,heuristic(state)
@@ -69,7 +69,7 @@ Intelligent Agent to play Connect-4 with a modifiable depth.
                     minChild = child, minValue = childValue
             return minChild, minValue
 
-    ```
+  ```
 ## Data Structures Used
 - Hash map to map from states to its children (next states).
 - Hash map to map from states to its values.
