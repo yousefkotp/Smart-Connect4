@@ -18,6 +18,9 @@ Intelligent Agent to play Connect-4 with a modifiable depth.
     + [With Pruning](#with-pruning)
   * [MiniMax Tree Visualizer](#minimax-tree-visualizer)
   * [Graphical Interface](#graphical-interface)
+    + [Landing Interface](#landing-interface)
+    + [Game Interface](#game-interface)
+    + [Settings Interface](#settings-interface)
   * [Contributors](#contributors)
 ## Deployment
 
@@ -199,6 +202,17 @@ Intelligent Agent to play Connect-4 with a modifiable depth.
 ## MiniMax Tree Visualizer
 
 ## Graphical Interface
+### Landing Interface
+
+![image](https://user-images.githubusercontent.com/41492875/202769630-24a76e93-53f6-40d7-9059-975f254698fb.png)
+
+### Game Interface
+
+![image](https://user-images.githubusercontent.com/41492875/202769769-9c29ff52-0e7b-4242-887b-1dd988664c50.png)
+
+### Settings Interface
+
+![image](https://user-images.githubusercontent.com/41492875/202769668-6d1438b5-48e9-4025-b410-646de5748d73.png)
 
 ## Contributors
 
