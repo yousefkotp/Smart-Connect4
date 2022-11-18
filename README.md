@@ -122,11 +122,12 @@ Function MiniMax(maxDepth, currentDepth, isMaxPlayer, state)
 </table>
 
 ### With Pruning
- <tr>
+
+<table align="center">
+  <tr>
     <th>Depth</th>
     <th>States Expanded</th>
     <th>Time Taken</th>
-
   </tr>
   <tr>
     <td>1</td>
