@@ -862,101 +862,52 @@ class TreeVisualizer:
 
         children = engine.BOARD.getChildrenFromMap(root)
 
-        color = GREY
+        color, txt = GREY, ''
         if children is not None and len(children) >= 1:
-            child1 = engine.BOARD.getChildrenFromMap(root)[0]
-            if self.isPruned(child1):
-                color = DARKRED
-            else:
-                color = DARKGREEN
-        child1Value = engine.BOARD.getValueFromMap(child1)
-        txt = str(child1Value)
-        if child1Value is None:
-            txt = '*PRUNED*'
+            child1 = children[0]
+            color, txt = self.styleNode(child1)
         child1Button = Button(window=screen, color=color, x=40, y=rootNodeButton.y + 300, width=140, height=100,
                               text=txt, shape='ellipse')
 
-        color = GREY
+        color, txt = GREY, ''
         if children is not None and len(children) >= 2:
             child2 = children[1]
-            if self.isPruned(child2):
-                color = DARKRED
-            else:
-                color = DARKGREEN
-        child2Value = engine.BOARD.getValueFromMap(child2)
-        txt = str(child2Value)
-        if child2Value is None:
-            txt = '*PRUNED*'
+            color, txt = self.styleNode(child2)
         child2Button = Button(window=screen, color=color, x=180, y=rootNodeButton.y + 200, width=140, height=100,
                               text=txt, shape='ellipse')
 
-        color = GREY
+        color, txt = GREY, ''
         if children is not None and len(children) >= 3:
-            child3 = engine.BOARD.getChildrenFromMap(root)[2]
-            if self.isPruned(child3):
-                color = DARKRED
-            else:
-                color = DARKGREEN
-        child3Value = engine.BOARD.getValueFromMap(child3)
-        txt = str(child3Value)
-        if child3Value is None:
-            txt = '*PRUNED*'
+            child3 = children[2]
+            color, txt = self.styleNode(child3)
         child3Button = Button(window=screen, color=color, x=320, y=rootNodeButton.y + 300, width=140, height=100,
                               text=txt, shape='ellipse')
 
-        color = GREY
+        color, txt = GREY, ''
         if children is not None and len(children) >= 4:
-            child4 = engine.BOARD.getChildrenFromMap(root)[3]
-            if self.isPruned(child4):
-                color = DARKRED
-            else:
-                color = DARKGREEN
-        child4Value = engine.BOARD.getValueFromMap(child4)
-        txt = str(child4Value)
-        if child4Value is None:
-            txt = '*PRUNED*'
+            child4 = children[3]
+            color, txt = self.styleNode(child4)
         child4Button = Button(window=screen, color=color, x=460, y=rootNodeButton.y + 200, width=140, height=100,
                               text=txt, shape='ellipse')
 
-        color = GREY
+        color, txt = GREY, ''
         if children is not None and len(children) >= 5:
-            child5 = engine.BOARD.getChildrenFromMap(root)[4]
-            if self.isPruned(child5):
-                color = DARKRED
-            else:
-                color = DARKGREEN
-        child5Value = engine.BOARD.getValueFromMap(child5)
-        txt = str(child5Value)
-        if child5Value is None:
-            txt = '*PRUNED*'
+            child5 = children[4]
+            color, txt = self.styleNode(child5)
         child5Button = Button(window=screen, color=color, x=600, y=rootNodeButton.y + 300, width=140, height=100,
                               text=txt, shape='ellipse')
 
-        color = GREY
+        color, txt = GREY, ''
         if children is not None and len(children) >= 6:
-            child6 = engine.BOARD.getChildrenFromMap(root)[5]
-            if self.isPruned(child6):
-                color = DARKRED
-            else:
-                color = DARKGREEN
-        child6Value = engine.BOARD.getValueFromMap(child6)
-        txt = str(child6Value)
-        if child6Value is None:
-            txt = '*PRUNED*'
+            child6 = children[5]
+            color, txt = self.styleNode(child6)
         child6Button = Button(window=screen, color=color, x=740, y=rootNodeButton.y + 200, width=140, height=100,
                               text=txt, shape='ellipse')
 
-        color = GREY
+        color, txt = GREY, ''
         if children is not None and len(children) >= 7:
-            child7 = engine.BOARD.getChildrenFromMap(root)[6]
-            if self.isPruned(child7):
-                color = DARKRED
-            else:
-                color = DARKGREEN
-        child7Value = engine.BOARD.getValueFromMap(child7)
-        txt = str(child7Value)
-        if child7Value is None:
-            txt = '*PRUNED*'
+            child7 = children[6]
+            color, txt = self.styleNode(child7)
         child7Button = Button(window=screen, color=color, x=880, y=rootNodeButton.y + 300, width=140, height=100,
                               text=txt, shape='ellipse')
 
@@ -992,6 +943,14 @@ class TreeVisualizer:
         child6Button.draw()
         child7Button.draw()
 
+    def styleNode(self, state):
+        if self.isNull(state):
+            return GREY, ''
+        if self.isPruned(state):
+            return DARKRED, '*PRUNED*'
+        value = engine.BOARD.getValueFromMap(state)
+        return DARKGREEN, str(value)
+
     def navigateNode(self, node, rootNode, nodeButton):
         global root
         if node is not None and engine.BOARD.getChildrenFromMap(node) is not None:
@@ -1002,11 +961,11 @@ class TreeVisualizer:
             rootX, nodeX = rootNodeButton.x, nodeButton.x
             while nodeX not in range(int(rootX) - 3, int(rootX) + 3) \
                     or nodeY not in range(int(rootY) - 3, int(rootY) + 3):
-                if nodeX < rootX:
+                if nodeX < rootX and nodeX not in range(int(rootX) - 3, int(rootX) + 3):
                     nodeX += 2
-                elif nodeX > rootX:
+                elif nodeX > rootX and nodeX not in range(int(rootX) - 3, int(rootX) + 3):
                     nodeX -= 2
-                if nodeY > rootY:
+                if nodeY > rootY and nodeY not in range(int(rootY) - 3, int(rootY) + 3):
                     nodeY -= 2
                 color = DARKGREEN
                 if math.sqrt(pow(rootX - nodeX, 2) + pow(rootY - nodeY, 2)) <= 200:
@@ -1153,19 +1112,19 @@ class TreeVisualizer:
                 gameWindow.switch()
             if parentNodeButton.isOver(event.pos):
                 self.goBackToParent()
-            elif child1Button.isOver(event.pos) and not self.isPruned(child1Button.text):
+            elif child1Button.isOver(event.pos) and self.isNavigable(child1Button.text):
                 self.navigateNode(node=child1, rootNode=root, nodeButton=child1Button)
-            elif child2Button.isOver(event.pos) and not self.isPruned(child2Button.text):
+            elif child2Button.isOver(event.pos) and self.isNavigable(child2Button.text):
                 self.navigateNode(node=child2, rootNode=root, nodeButton=child2Button)
-            elif child3Button.isOver(event.pos) and not self.isPruned(child3Button.text):
+            elif child3Button.isOver(event.pos) and self.isNavigable(child3Button.text):
                 self.navigateNode(node=child3, rootNode=root, nodeButton=child3Button)
-            elif child4Button.isOver(event.pos) and not self.isPruned(child4Button.text):
+            elif child4Button.isOver(event.pos) and self.isNavigable(child4Button.text):
                 self.navigateNode(node=child4, rootNode=root, nodeButton=child4Button)
-            elif child5Button.isOver(event.pos) and not self.isPruned(child5Button.text):
+            elif child5Button.isOver(event.pos) and self.isNavigable(child5Button.text):
                 self.navigateNode(node=child5, rootNode=root, nodeButton=child5Button)
-            elif child6Button.isOver(event.pos) and not self.isPruned(child6Button.text):
+            elif child6Button.isOver(event.pos) and self.isNavigable(child6Button.text):
                 self.navigateNode(node=child6, rootNode=root, nodeButton=child6Button)
-            elif child7Button.isOver(event.pos) and not self.isPruned(child7Button.text):
+            elif child7Button.isOver(event.pos) and self.isNavigable(child7Button.text):
                 self.navigateNode(node=child7, rootNode=root, nodeButton=child7Button)
 
             pygame.display.update()
@@ -1183,8 +1142,14 @@ class TreeVisualizer:
         pygame.display.update()
 
     def isPruned(self, state):
-        return state == '*PRUNED*' or state == 'None'\
+        return state == '*PRUNED*'\
                or int(state) & int('1000000000000000000000000000000000000000000000000000000000000000', 2) == 0
+
+    def isNull(self, state):
+        return state is None or state == ''
+
+    def isNavigable(self, state):
+        return not self.isNull(state) and not self.isPruned(state)
 
 
 class SettingsWindow:
