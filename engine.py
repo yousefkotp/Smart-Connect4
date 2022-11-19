@@ -109,7 +109,6 @@ def convertToNumber(twoDimensionalState):
 # the value is
 
 
-
 def check_neigbours(x, y, value, array,state):
     if value == 1:
         other_player = 0
@@ -131,40 +130,61 @@ def check_neigbours(x, y, value, array,state):
     # print(decimalToBinary(state))
     if x <= 2:
         temp = 0
+        level=0
         for i in range(0, 4):
             temp += map[array[x + i][y]]
-        if temp ==4:
-            cost += 24
-        elif temp ==3:
-            cost+=13
-        elif temp==2:
-            cost+=3
+            if x + i <= last[y]:
+                level += 1
+        if temp == 4:
+            cost += 4000
+        elif temp == 3 and level == 4:
+            cost += 13
+        elif temp == 3 and level == 3:
+            cost += 7
+        elif temp == 2 and level == 4:
+            cost += 3
+        elif temp == 2 and level < 4:
+            cost += 1.5
         if temp == -47:
             cost -= 10
 
     if y <= 3:
         temp = 0
+        level=0
         for i in range(0, 4):
             temp += map[array[x][y + i]]
+            if x <= last[y + i]:
+                level += 1
         if temp == 4:
-            cost += 24
-        elif temp == 3:
+            cost += 4000
+        elif temp == 3 and level == 4:
             cost += 13
-        elif temp == 2:
+        elif temp == 3 and level == 3:
+            cost += 7
+        elif temp == 2 and level == 4:
             cost += 3
+        elif temp == 2 and level < 4:
+            cost += 1.5
         if temp == -47:
             cost -= 10
 
     if y >= 3:
         temp = 0
+        level=0;
         for i in range(0, 4):
                 temp += map[array[x][y - i]]
-        if temp == 3 and map[array[x][y - 3]]==0 :
+                if x <= last[y - i]:
+                    level += 1
+        if temp == 3 and map[array[x][y - 3]]==0 and level==4:
                 cost += 13
-        if temp == 2 and map[array[x][y]]==1 and map[array[x][y - 3]]==0:
+        if temp == 3 and map[array[x][y - 3]] == 0 and level < 4:
+            cost += 7
+        if temp == 2 and map[array[x][y]]==1 and map[array[x][y - 3]]==0 and level==4:
                 cost += 3
+        if temp == 2 and map[array[x][y]] == 1 and map[array[x][y - 3]] == 0 and level == 4:
+            cost += 1.5
         if temp == -47:
-                cost -= 10
+            cost -= 10
 
     if x <= 2 and y <= 3:
         temp = 0
@@ -174,7 +194,7 @@ def check_neigbours(x, y, value, array,state):
             if x+i <= last[y+i]:
                 level+=1
         if temp == 4:
-            cost += 24
+            cost += 4000
         elif temp == 3  and level==4:
             cost += 13
         elif temp == 3 and level == 3:
@@ -191,10 +211,10 @@ def check_neigbours(x, y, value, array,state):
         level=0
         for i in range(0, 4):
             temp += map[array[x + i][y - i]]
-            if y - i <= last[x + i]:
+            if x+i <= last[y-i]:
                 level += 1
         if temp == 4:
-            cost += 24
+            cost += 4000
         elif temp == 3 and level==4:
             cost += 13
         elif temp == 3 and level == 3:
@@ -210,6 +230,8 @@ def check_neigbours(x, y, value, array,state):
         return cost
     else:
         return -cost
+
+
 
 
 #
@@ -299,8 +321,11 @@ def heuristic(state):
 
     # print("----------------------------value is : " + str(value))
     return value
-
-
+# print("--------------------------------")
+# print(heuristic(12111324587728441408))
+# print(heuristic(10381947003742588992))
+# print(heuristic(10378570937236916556))
+# print("-----------------------------")
 def check_final_score(x, y, value, array):
     if value == 1:
         other_player = 0
@@ -316,7 +341,7 @@ def check_final_score(x, y, value, array):
         for i in range(0, 4):
             temp += map[array[x + i][y]]
         if temp == 4:
-            cost += 24
+            cost += 1000
             # print(str(temp) + " 1 cond")
 
     if y <= 3:
@@ -324,7 +349,7 @@ def check_final_score(x, y, value, array):
         for i in range(0, 4):
             temp += map[array[x][y + i]]
         if temp == 4:
-            cost += 24
+            cost += 1000
             # print(str(temp) + " 2 cond")
 
     if x <= 2 and y <= 3:
@@ -332,7 +357,7 @@ def check_final_score(x, y, value, array):
         for i in range(0, 4):
             temp += map[array[x + i][y + i]]
         if temp == 4:
-            cost += 24
+            cost += 1000
             # print(str(temp) + " 3 cond")
 
     if x <= 2 and y >= 3:
@@ -340,7 +365,7 @@ def check_final_score(x, y, value, array):
         for i in range(0, 4):
             temp += map[array[x + i][y - i]]
         if temp == 4:
-            cost += 24
+            cost += 1000
             # print(str(temp) + " fourth cond")
 
     if value == 1:
