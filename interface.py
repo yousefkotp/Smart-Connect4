@@ -826,6 +826,8 @@ class TreeVisualizer:
                 self.buttonResponseToMouseEvent(event)
 
     def setupTreeVisualizer(self):
+        global minimaxCurrentMode
+        minimaxCurrentMode = 'MAX'
         pygame.display.flip()
         pygame.display.set_caption('Smart Connect4 :) - Tree Visualizer')
         self.refreshTreeVisualizer(rootNode=None)
