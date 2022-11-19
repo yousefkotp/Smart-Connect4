@@ -109,7 +109,8 @@ def convertToNumber(twoDimensionalState):
 # the value is
 
 
-def check_neigbours(x, y, value, array):
+
+def check_neigbours(x, y, value, array,state):
     if value == 1:
         other_player = 0
     else:
@@ -119,67 +120,170 @@ def check_neigbours(x, y, value, array):
     map[value] = 1
     map[-1] = 0
     map[other_player] = -50
+    last=[]
+    k=60
+    for i in range(0,7):
+        temp = ((7<<k) & state) >> k
+        last.append(temp-1)
+        k-=9
+    # for i in range(0,7):
+    #     print(last[i])
+    # print(decimalToBinary(state))
     if x <= 2:
         temp = 0
         for i in range(0, 4):
             temp += map[array[x + i][y]]
-        if temp > 1:
-            # if (value == 1):
-            #     print(str(temp) + " first cond")
-            # else:
-            #     print("-" + str(temp) + " first cond")
-            cost += temp
+        if temp ==4:
+            cost += 24
+        elif temp ==3:
+            cost+=13
+        elif temp==2:
+            cost+=3
         if temp == -47:
-            cost -= 1
-            # print(" -1 y pasha")
+            cost -= 10
 
     if y <= 3:
         temp = 0
         for i in range(0, 4):
             temp += map[array[x][y + i]]
-        if temp > 1:
-            # if (value == 1):
-            #     print(str(temp) + " second cond")
-            # else:
-            #     print("-" + str(temp) + " second cond")
-            cost += temp
+        if temp == 4:
+            cost += 24
+        elif temp == 3:
+            cost += 13
+        elif temp == 2:
+            cost += 3
         if temp == -47:
-            cost -= 1
-            # print(" -1 y pasha")
+            cost -= 10
+
+    if y >= 3:
+        temp = 0
+        for i in range(0, 4):
+                temp += map[array[x][y - i]]
+        if temp == 3 and map[array[x][y - 3]]==0 :
+                cost += 13
+        if temp == 2 and map[array[x][y]]==1 and map[array[x][y - 3]]==0:
+                cost += 3
+        if temp == -47:
+                cost -= 10
 
     if x <= 2 and y <= 3:
         temp = 0
+        level=0
         for i in range(0, 4):
             temp += map[array[x + i][y + i]]
-        if temp > 1:
-            # if (value == 1):
-            #     print(str(temp) + " third cond")
-            # else:
-            #     print("-" + str(temp) + " third cond")
-            cost += temp
+            if x+i <= last[y+i]:
+                level+=1
+        if temp == 4:
+            cost += 24
+        elif temp == 3  and level==4:
+            cost += 13
+        elif temp == 3 and level == 3:
+            cost += 7
+        elif temp == 2 and level == 4:
+            cost += 3
+        elif temp == 2 and level < 4:
+            cost += 1.5
         if temp == -47:
-            cost -= 1
-            # print(" -1 y pasha")
+            cost -= 10
 
     if x <= 2 and y >= 3:
         temp = 0
+        level=0
         for i in range(0, 4):
             temp += map[array[x + i][y - i]]
-            # print("--" + str(temp) + "---")
-        if temp > 1:
-            # if (value == 1):
-            #     print(str(temp) + " fourth cond")
-            # else:
-            #     print("-" + str(temp) + " fourth cond")
-            cost += temp
+            if y - i <= last[x + i]:
+                level += 1
+        if temp == 4:
+            cost += 24
+        elif temp == 3 and level==4:
+            cost += 13
+        elif temp == 3 and level == 3:
+            cost += 7
+        elif temp == 2 and level ==4:
+            cost += 3
+        elif temp == 2 and level<4:
+            cost+=1.5
         if temp == -47:
-            cost -= 1
-            # print(" -2 y pasha")
+            cost -= 10
 
     if value == 1:
         return cost
     else:
         return -cost
+
+
+#
+# def check_neigbours(x, y, value, array):
+#     if value == 1:
+#         other_player = 0
+#     else:
+#         other_player = 1
+#     cost = 0
+#     map = {}
+#     map[value] = 1
+#     map[-1] = 0
+#     map[other_player] = -50
+#     if x <= 2:
+#         temp = 0
+#         for i in range(0, 4):
+#             temp += map[array[x + i][y]]
+#         if temp > 1:
+#             # if (value == 1):
+#             #     print(str(temp) + " first cond")
+#             # else:
+#             #     print("-" + str(temp) + " first cond")
+#             cost += temp
+#         if temp == -47:
+#             cost -= 1
+#             # print(" -1 y pasha")
+#
+#     if y <= 3:
+#         temp = 0
+#         for i in range(0, 4):
+#             temp += map[array[x][y + i]]
+#         if temp > 1:
+#             # if (value == 1):
+#             #     print(str(temp) + " second cond")
+#             # else:
+#             #     print("-" + str(temp) + " second cond")
+#             cost += temp
+#         if temp == -47:
+#             cost -= 1
+#             # print(" -1 y pasha")
+#
+#     if x <= 2 and y <= 3:
+#         temp = 0
+#         for i in range(0, 4):
+#             temp += map[array[x + i][y + i]]
+#         if temp > 1:
+#             # if (value == 1):
+#             #     print(str(temp) + " third cond")
+#             # else:
+#             #     print("-" + str(temp) + " third cond")
+#             cost += temp
+#         if temp == -47:
+#             cost -= 1
+#             # print(" -1 y pasha")
+#
+#     if x <= 2 and y >= 3:
+#         temp = 0
+#         for i in range(0, 4):
+#             temp += map[array[x + i][y - i]]
+#             # print("--" + str(temp) + "---")
+#         if temp > 1:
+#             # if (value == 1):
+#             #     print(str(temp) + " fourth cond")
+#             # else:
+#             #     print("-" + str(temp) + " fourth cond")
+#             cost += temp
+#         if temp == -47:
+#             cost -= 1
+#             # print(" -2 y pasha")
+#
+#     if value == 1:
+#         return cost
+#     else:
+#         return -cost
 
 
 def heuristic(state):
@@ -190,7 +294,9 @@ def heuristic(state):
         for j in range(0, 7):
             # print(str(i) + "-" + str(j))
             if array[i][j] != -1:
-                value += check_neigbours(i, j, array[i][j], array)
+                value += check_neigbours(i, j, array[i][j], array,state)
+                # print("--------------")
+
     # print("----------------------------value is : " + str(value))
     return value
 
@@ -210,7 +316,7 @@ def check_final_score(x, y, value, array):
         for i in range(0, 4):
             temp += map[array[x + i][y]]
         if temp == 4:
-            cost += 4
+            cost += 24
             # print(str(temp) + " 1 cond")
 
     if y <= 3:
@@ -218,7 +324,7 @@ def check_final_score(x, y, value, array):
         for i in range(0, 4):
             temp += map[array[x][y + i]]
         if temp == 4:
-            cost += 4
+            cost += 24
             # print(str(temp) + " 2 cond")
 
     if x <= 2 and y <= 3:
@@ -226,7 +332,7 @@ def check_final_score(x, y, value, array):
         for i in range(0, 4):
             temp += map[array[x + i][y + i]]
         if temp == 4:
-            cost += 4
+            cost += 24
             # print(str(temp) + " 3 cond")
 
     if x <= 2 and y >= 3:
@@ -234,7 +340,7 @@ def check_final_score(x, y, value, array):
         for i in range(0, 4):
             temp += map[array[x + i][y - i]]
         if temp == 4:
-            cost += temp
+            cost += 24
             # print(str(temp) + " fourth cond")
 
     if value == 1:
@@ -248,10 +354,10 @@ def get_final_score(state):
     value = 0
     for i in range(0, 6):
         for j in range(0, 7):
-            # print(str(i) + "-" + str(j))
             if array[i][j] != -1:
                 value += check_final_score(i, j, array[i][j], array)
-    return value
+    return value;
+
 
 
 # max =1
