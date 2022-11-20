@@ -82,12 +82,12 @@ Intelligent Agent to play Connect-4 with a modifiable depth.
 - Certain weighting criteria is developed by us to evaluate the strength of the moves.
 - In this Program we offer 2 heuristics:
 - The more intuitive and simple one:
-    - Positive part
+   - Positive part
      * 4 consecutive (AI color) gets 4 points
      * 3 candidate consecutive (AI color) gets 3 points
      * 2 candidate consecutive (AI color) gets 2 points
      * stopping opponent from getting a point gets 1 point
-    - Negative part
+   - Negative part
      * 4 consecutive (Human color) gets -4 points
      * 3 candidate consecutive (Human color) gets -3 points
      * 2 candidate consecutive (Human color) gets -2 points
