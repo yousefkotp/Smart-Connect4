@@ -77,12 +77,17 @@ GAME_MODE = -1
 gameInSession = False
 moveMade = False
 
+AI_PLAYS_FIRST = False  # Set to true for AI to make the first move
+
 nodeStack = []
+
 minimaxCurrentMode = "MAX"
 
 #   Game Modes  #
 SINGLE_PLAYER = 1
 TWO_PLAYERS = 2
+WHO_PLAYS_FIRST = -2
+MAIN_MENU = -1
 
 # Developer Mode: facilitates debugging during GUI development
 DEVMODE = False
@@ -292,9 +297,9 @@ class GameWindow:
         """
         Prints the game board to the terminal
         """
-        # print('\n-\n' +
-        #       str(GAME_BOARD) +
-        #       '\n Player ' + str(TURN) + ' plays next')
+        print('\n-\n' +
+              str(GAME_BOARD) +
+              '\n Player ' + str(TURN) + ' plays next')
 
     def drawGameBoard(self):
         """
@@ -470,16 +475,15 @@ class GameWindow:
         """
         Runs the game session
         """
-        global GAME_OVER, TURN, GAME_BOARD, gameInSession, moveMade
+        global GAME_OVER, TURN, GAME_BOARD, gameInSession, moveMade, AI_PLAYS_FIRST
         gameInSession = True
         nodeStack.clear()
 
-        # Uncomment the following to make the AI play first
-
-        # if not GAME_OVER:
-        #     switchTurn()
-        #     self.player2Play()
-        #     moveMade = True
+        if AI_PLAYS_FIRST and not GAME_OVER:
+            switchTurn()
+            self.player2Play()
+            moveMade = True
+            AI_PLAYS_FIRST = False
 
         while True:
             pygame.display.update()
@@ -513,7 +517,6 @@ class GameWindow:
                                 pygame.mouse.set_visible(True)
                                 self.refreshGameWindow()
                                 break
-                            self.printGameBoard()
 
     def player2Play(self):
         if GAME_MODE == SINGLE_PLAYER:
@@ -632,7 +635,7 @@ class MainMenu:
         self.show()
 
     def show(self):
-        while GAME_MODE == -1:
+        while GAME_MODE == MAIN_MENU:
             pygame.display.update()
 
             for event in pygame.event.get():
@@ -641,14 +644,17 @@ class MainMenu:
 
                 self.buttonResponseToMouseEvent(event)
 
-        startGameSession()
+        if GAME_MODE == WHO_PLAYS_FIRST:
+            WhoPlaysFirstMenu().switch()
+        else:
+            startGameSession()
 
     def setupMainMenu(self):
         """
         Initializes the all components in the frame
         """
         global GAME_MODE, gameInSession
-        GAME_MODE = -1
+        GAME_MODE = MAIN_MENU
         gameInSession = False
         pygame.display.flip()
         pygame.display.set_caption('Smart Connect4 :) - Main Menu')
@@ -730,7 +736,7 @@ class MainMenu:
             if singlePlayerButton.isOver(event.pos):
                 alterButtonAppearance(singlePlayerButton, WHITE, BLACK,
                                       hasGradBackground=True, gradLeftColor=GREEN, gradRightColor=BLUE)
-                setGameMode(SINGLE_PLAYER)
+                setGameMode(WHO_PLAYS_FIRST)
             elif multiPlayerButton.isOver(event.pos):
                 alterButtonAppearance(multiPlayerButton, WHITE, BLACK,
                                       hasGradBackground=True, gradLeftColor=GREEN, gradRightColor=BLUE)
@@ -740,6 +746,119 @@ class MainMenu:
                                       hasGradBackground=True, gradLeftColor=GREEN, gradRightColor=BLUE)
                 settingsWindow = SettingsWindow()
                 settingsWindow.switch()
+
+
+class WhoPlaysFirstMenu:
+    def switch(self):
+        self.setupWPFMenu()
+        self.show()
+
+    def show(self):
+        while GAME_MODE == WHO_PLAYS_FIRST:
+            pygame.display.update()
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    sys.exit()
+
+                self.buttonResponseToMouseEvent(event)
+
+        startGameSession()
+
+    def setupWPFMenu(self):
+        """
+        Initializes the all components in the frame
+        """
+        pygame.display.flip()
+        pygame.display.set_caption('Smart Connect4 :) - Who Plays First?')
+        self.refreshWPFMenu()
+
+    def refreshWPFMenu(self):
+        """
+        Refreshes the screen and all the components
+        """
+        pygame.display.flip()
+        refreshBackground(BLACK, GREY)
+        self.drawWPFButtons()
+        self.drawWPFLabels()
+
+    def reloadBackButton(self, icon):
+        backButton.draw()
+        screen.blit(icon, (backButton.x + 2, backButton.y + 2))
+
+    def drawWPFButtons(self):
+        global playerFirstButton, computerFirstButton
+        global backButton, backIcon, backIconAccent
+
+        backIconAccent = pygame.image.load('GUI/back-icon.png').convert_alpha()
+        backIcon = pygame.image.load('GUI/back-icon-accent.png').convert_alpha()
+
+        backButton = Button(window=screen, color=(81, 81, 81), x=WIDTH - 70, y=20, width=52, height=52)
+        self.reloadBackButton(backIcon)
+
+        playerFirstButton = Button(
+            window=screen, color=LIGHTGREY, x=WIDTH / 2 - 220, y=HEIGHT / 2, width=200, height=HEIGHT / 6,
+            gradCore=True, coreLeftColor=GREEN, coreRightColor=BLUE, text='HUMAN')
+
+        computerFirstButton = Button(
+            window=screen, color=LIGHTGREY, x=WIDTH / 2 + 20, y=HEIGHT / 2, width=200,
+            height=HEIGHT / 6,
+            gradCore=True, coreLeftColor=GREEN, coreRightColor=BLUE, text='COMPUTER')
+
+        playerFirstButton.draw(BLACK, 2)
+        computerFirstButton.draw(BLACK, 2)
+
+    def drawWPFLabels(self):
+        titleFont = pygame.font.SysFont("Sans Serif", 65, True, True)
+        mainLabel = titleFont.render("Who Plays First ?", True, LIGHTGREY)
+        screen.blit(mainLabel, (WIDTH / 2 - mainLabel.get_width()/2, HEIGHT / 3 - mainLabel.get_height()/2))
+
+    def buttonResponseToMouseEvent(self, event):
+        """
+        Handles button behaviour in response to mouse events influencing them
+        """
+        if event.type == pygame.MOUSEMOTION:
+            if playerFirstButton.isOver(event.pos):
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+                alterButtonAppearance(playerFirstButton, WHITE, BLACK,
+                                      hasGradBackground=True, gradLeftColor=WHITE, gradRightColor=BLUE)
+            elif computerFirstButton.isOver(event.pos):
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+                alterButtonAppearance(computerFirstButton, WHITE, BLACK,
+                                      hasGradBackground=True, gradLeftColor=WHITE, gradRightColor=BLUE)
+            elif backButton.isOver(event.pos):
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+                self.reloadBackButton(backIconAccent)
+            else:
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+                alterButtonAppearance(playerFirstButton, LIGHTGREY, BLACK,
+                                      hasGradBackground=True, gradLeftColor=GREEN, gradRightColor=BLUE)
+                alterButtonAppearance(computerFirstButton, LIGHTGREY, BLACK,
+                                      hasGradBackground=True, gradLeftColor=GREEN, gradRightColor=BLUE)
+                self.reloadBackButton(backIcon)
+
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if playerFirstButton.isOver(event.pos):
+                alterButtonAppearance(playerFirstButton, WHITE, BLACK,
+                                      hasGradBackground=True, gradLeftColor=GOLD, gradRightColor=BLUE)
+            elif computerFirstButton.isOver(event.pos):
+                alterButtonAppearance(computerFirstButton, WHITE, BLACK,
+                                      hasGradBackground=True, gradLeftColor=GOLD, gradRightColor=BLUE)
+            elif backButton.isOver(event.pos):
+                MainMenu().switch()
+
+        if event.type == pygame.MOUSEBUTTONUP:
+            global GAME_MODE, AI_PLAYS_FIRST
+            if playerFirstButton.isOver(event.pos):
+                alterButtonAppearance(playerFirstButton, WHITE, BLACK,
+                                      hasGradBackground=True, gradLeftColor=GREEN, gradRightColor=BLUE)
+                AI_PLAYS_FIRST = False
+                setGameMode(SINGLE_PLAYER)
+            elif computerFirstButton.isOver(event.pos):
+                alterButtonAppearance(computerFirstButton, WHITE, BLACK,
+                                      hasGradBackground=True, gradLeftColor=GREEN, gradRightColor=BLUE)
+                AI_PLAYS_FIRST = True
+                setGameMode(SINGLE_PLAYER)
 
 
 class Button:
@@ -1081,7 +1200,6 @@ class TreeVisualizer:
             elif child2Button.isOver(event.pos):
                 if child2 is not None:
                     pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
-                    # self.hoverOverNode(nodeButton=child2Button, nodeState=child2)
                     self.hoverOverNode(nodeButton=child2Button, nodeState=child2)
             elif child3Button.isOver(event.pos):
                 if child3 is not None:
@@ -1145,7 +1263,7 @@ class TreeVisualizer:
         pygame.display.update()
 
     def isPruned(self, state):
-        return state == '*PRUNED*'\
+        return state == '*PRUNED*' \
                or int(state) & int('1000000000000000000000000000000000000000000000000000000000000000', 2) == 0
 
     def isNull(self, state):
@@ -1169,6 +1287,8 @@ class SettingsWindow:
                     sys.exit()
 
                 self.buttonResponseToMouseEvent(event)
+
+        startGameSession()
 
     def setupSettingsMenu(self):
         """
@@ -1334,10 +1454,10 @@ def gradientRect(window, left_colour, right_colour, target_rect, text=None, font
     """
     Draw a horizontal-gradient filled rectangle covering <target_rect>
     """
-    colour_rect = pygame.Surface((2, 2))  # tiny! 2x2 bitmap
-    pygame.draw.line(colour_rect, left_colour, (0, 0), (0, 1))  # left colour line
-    pygame.draw.line(colour_rect, right_colour, (1, 0), (1, 1))  # right colour line
-    colour_rect = pygame.transform.smoothscale(colour_rect, (target_rect.width, target_rect.height))  # stretch!
+    colour_rect = pygame.Surface((2, 2))  # 2x2 bitmap
+    pygame.draw.line(colour_rect, left_colour, (0, 0), (0, 1))
+    pygame.draw.line(colour_rect, right_colour, (1, 0), (1, 1))
+    colour_rect = pygame.transform.smoothscale(colour_rect, (target_rect.width, target_rect.height))
     window.blit(colour_rect, target_rect)
 
     if text:
