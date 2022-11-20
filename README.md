@@ -31,7 +31,7 @@ Intelligent Agent to play Connect-4 with a modifiable depth.
 
 
 ## State Representation
-- The simplest way to represent the board is using a 2D array. However, using 2D array uses ($6\times 7\times size of integer). This representation would limits the agent by only reaching short search depth and doesn't enable the agent to go deep in the search tree.
+- The simplest way to represent the board is using a 2D array. However, using 2D array uses ( $6\times 7\times size of integer$ ). This representation would limits the agent by only reaching short search depth and doesn't enable the agent to go deep in the search tree.
 - The board configuration (state) is represented as 64-bit number as each column takes 9 bits and is represented as follows:
     - A 3 bits for each column which points to the last empty location, we can call them last location mask, for example if the three bits is "001" indeicates that the next location is the first row
     - A 6 bits representing each slot inside that column, 0 for the human and 1 for the intelligent agent.
