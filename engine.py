@@ -441,15 +441,15 @@ def getChildren(player, state):
     return children
 
 
-def miniMax(maxDepth, depth, isMaxPlayer, state):
+def miniMax(maxDepth, depth, isMaxPlayer, state, heuristic):
     BOARD.numberOfNodesExpanded+=1
     if depth == maxDepth:
-        value = heuristic1(state)
+        value = heuristic1(state) if heuristic == 0 else heuristic2(state)
         BOARD.mapValues[state] = value
         return state, value
 
     if isGameOver(state):
-        value = get_final_score1(state)
+        value = get_final_score1(state) if heuristic == 0 else get_final_score2(state)
         BOARD.mapValues[state] = value
         return state, value
 
@@ -459,7 +459,7 @@ def miniMax(maxDepth, depth, isMaxPlayer, state):
         maxChild = None
         maxValue = -math.inf
         for child in children:
-            childValue = miniMax(maxDepth, depth + 1, not isMaxPlayer, child)[1]
+            childValue = miniMax(maxDepth, depth + 1, not isMaxPlayer, child, heuristic)[1]
             if childValue > maxValue:
                 maxChild = child
                 maxValue = childValue
@@ -469,7 +469,7 @@ def miniMax(maxDepth, depth, isMaxPlayer, state):
         minChild = None
         minValue = math.inf
         for child in children:
-            childValue = miniMax(maxDepth, depth + 1, not isMaxPlayer, child)[1]
+            childValue = miniMax(maxDepth, depth + 1, not isMaxPlayer, child, heuristic)[1]
             if childValue < minValue:
                 minValue = childValue
                 minChild = child
@@ -477,15 +477,15 @@ def miniMax(maxDepth, depth, isMaxPlayer, state):
         return minChild, minValue
 
 
-def miniMaxAlphaBeta(maxDepth, depth, isMaxPlayer, state, alpha, beta):
+def miniMaxAlphaBeta(maxDepth, depth, isMaxPlayer, state, alpha, beta, heuristic):
     BOARD.numberOfNodesExpanded+=1
     if depth == maxDepth:
-        value = heuristic1(state)
+        value = heuristic1(state) if heuristic == 0 else heuristic2(state)
         BOARD.mapValues[state] = value
         return state, value
 
     if isGameOver(state):
-        value = get_final_score1(state)
+        value = get_final_score1(state) if heuristic == 0 else get_final_score2(state)
         BOARD.mapValues[state] = value
         return state, value
 
@@ -495,7 +495,7 @@ def miniMaxAlphaBeta(maxDepth, depth, isMaxPlayer, state, alpha, beta):
         maxValue = -math.inf
         index = 0
         for child in children:
-            childValue = miniMaxAlphaBeta(maxDepth, depth + 1, False, child, alpha, beta)[1]
+            childValue = miniMaxAlphaBeta(maxDepth, depth + 1, False, child, alpha, beta, heuristic)[1]
             if childValue > maxValue:
                 maxChild = child
                 maxValue = childValue
@@ -514,7 +514,7 @@ def miniMaxAlphaBeta(maxDepth, depth, isMaxPlayer, state, alpha, beta):
         minValue = math.inf
         index = 0
         for child in children:
-            childValue = miniMaxAlphaBeta(maxDepth, depth + 1, True, child, alpha, beta)[1]
+            childValue = miniMaxAlphaBeta(maxDepth, depth + 1, True, child, alpha, beta, heuristic)[1]
             if childValue < minValue:
                 minValue = childValue
                 minChild = child
@@ -531,14 +531,14 @@ def miniMaxAlphaBeta(maxDepth, depth, isMaxPlayer, state, alpha, beta):
 
 
 
-def nextMove(alphaBetaPruning, state):  # The function returns the next best state in integer form
+def nextMove(alphaBetaPruning, state, heuristic):  # The function returns the next best state in integer form
     start_time = time.time()
     BOARD.numberOfNodesExpanded=0
     BOARD.lastState= state
     if alphaBetaPruning:
-        ans= miniMaxAlphaBeta(BOARD.maxDepth, 0, True, state, -math.inf, math.inf)[0]
+        ans= miniMaxAlphaBeta(BOARD.maxDepth, 0, True, state, -math.inf, math.inf, heuristic)[0]
     else:
-        ans =miniMax(BOARD.maxDepth, 0, True, state)[0]
+        ans =miniMax(BOARD.maxDepth, 0, True, state, heuristic)[0]
     print(BOARD.numberOfNodesExpanded)
     print(time.time()-start_time)
     return ans

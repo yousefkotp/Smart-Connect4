@@ -533,7 +533,7 @@ class GameWindow:
 
         flippedGameBoard = np.flip(m=GAME_BOARD, axis=0)  # Flip about x-axis
         numericState = engine.convertToNumber(flippedGameBoard)
-        boardState = engine.nextMove(alphaBetaPruning=usePruning, state=numericState)
+        boardState = engine.nextMove(alphaBetaPruning=usePruning, state=numericState, heuristic=HEURISTIC_USED)
         flippedNewState = engine.convertToTwoDimensions(boardState)
         newState = np.flip(m=flippedNewState, axis=0)  # Flip about x-axis
 
@@ -1286,7 +1286,8 @@ class SettingsWindow:
         modifyDepthButton.draw(BLACK)
 
         heuristicComboBox = OptionBox(x=30, y=modifyDepthButton.y + modifyDepthButton.height + 20,
-                                      width=200, height=50, color=LIGHTGREY, highlight_color=GOLD, selected=HEURISTIC_USED,
+                                      width=200, height=50, color=LIGHTGREY, highlight_color=GOLD,
+                                      selected=HEURISTIC_USED,
                                       font=pygame.font.SysFont("comicsans", 15),
                                       option_list=['Heuristic V1', 'Heuristic V2'])
         heuristicComboBox.draw(screen)
