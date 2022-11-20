@@ -76,6 +76,7 @@ screen = pygame.display.set_mode(WINDOW_SIZE)
 GAME_MODE = -1
 gameInSession = False
 moveMade = False
+HEURISTIC_USED = 1
 
 AI_PLAYS_FIRST = False  # Set to true for AI to make the first move
 
@@ -811,7 +812,7 @@ class WhoPlaysFirstMenu:
     def drawWPFLabels(self):
         titleFont = pygame.font.SysFont("Sans Serif", 65, True, True)
         mainLabel = titleFont.render("Who Plays First ?", True, LIGHTGREY)
-        screen.blit(mainLabel, (WIDTH / 2 - mainLabel.get_width()/2, HEIGHT / 3 - mainLabel.get_height()/2))
+        screen.blit(mainLabel, (WIDTH / 2 - mainLabel.get_width() / 2, HEIGHT / 3 - mainLabel.get_height() / 2))
 
     def buttonResponseToMouseEvent(self, event):
         """
@@ -859,75 +860,6 @@ class WhoPlaysFirstMenu:
                                       hasGradBackground=True, gradLeftColor=GREEN, gradRightColor=BLUE)
                 AI_PLAYS_FIRST = True
                 setGameMode(SINGLE_PLAYER)
-
-
-class Button:
-    def __init__(self, window, color, x, y, width, height, text='', isChecked=False, gradCore=False, coreLeftColor=None,
-                 coreRightColor=None, gradOutline=False, outLeftColor=None, outRightColor=None, shape='rect'):
-        self.color = color
-        self.x = x
-        self.y = y
-        self.width = width
-        self.height = height
-        self.text = text
-        self.screen = window
-        self.isChecked = isChecked
-        self.gradCore = gradCore
-        self.coreLeftColor = coreLeftColor
-        self.coreRightColor = coreRightColor
-        self.gradOutline = gradOutline
-        self.outLeftColor = outLeftColor
-        self.outRightColor = outRightColor
-        self.shape = shape
-
-    def draw(self, outline=None, outlineThickness=2, font='comicsans', fontSize=15, fontColor=BLACK):
-        """
-        Draws the button on screen
-        """
-        if self.shape.lower() == 'rect':
-            if outline:
-                rectOutline = pygame.draw.rect(self.screen, outline, (self.x, self.y,
-                                                                      self.width, self.height), 0)
-                if self.gradOutline:
-                    gradientRect(self.screen, self.outLeftColor, self.outRightColor, rectOutline)
-            button = pygame.draw.rect(self.screen, self.color, (self.x + outlineThickness, self.y + outlineThickness,
-                                                                self.width - 2 * outlineThickness,
-                                                                self.height - 2 * outlineThickness), 0)
-            if self.gradCore:
-                gradientRect(self.screen, self.coreLeftColor, self.coreRightColor, button, self.text, font, fontSize)
-
-            if self.text != '':
-                font = pygame.font.SysFont(font, fontSize)
-                text = font.render(self.text, True, fontColor)
-                self.screen.blit(text, (
-                    self.x + (self.width / 2 - text.get_width() / 2),
-                    self.y + (self.height / 2 - text.get_height() / 2)))
-        elif self.shape.lower() == 'ellipse':
-            if outline:
-                rectOutline = pygame.draw.ellipse(self.screen, outline, (self.x, self.y,
-                                                                         self.width, self.height), 0)
-            button = pygame.draw.ellipse(self.screen, self.color, (self.x + outlineThickness, self.y + outlineThickness,
-                                                                   self.width - 2 * outlineThickness,
-                                                                   self.height - 2 * outlineThickness), 0)
-            if self.text != '':
-                font = pygame.font.SysFont(font, fontSize)
-                text = font.render(self.text, True, fontColor)
-                self.screen.blit(text, (
-                    self.x + (self.width / 2 - text.get_width() / 2),
-                    self.y + (self.height / 2 - text.get_height() / 2)))
-        else:
-            button = pygame.draw.circle(self.screen, self.color, (self.x + outlineThickness, self.y + outlineThickness,
-                                                                  self.width - 2 * outlineThickness,
-                                                                  self.height - 2 * outlineThickness), 0)
-        return self, button
-
-    def isOver(self, pos):
-        # Pos is the mouse position or a tuple of (x,y) coordinates
-        if self.x < pos[0] < self.x + self.width:
-            if self.y < pos[1] < self.y + self.height:
-                return True
-
-        return False
 
 
 class TreeVisualizer:
@@ -1282,11 +1214,19 @@ class SettingsWindow:
         while True:
             pygame.display.update()
 
-            for event in pygame.event.get():
+            event_list = pygame.event.get()
+            for event in event_list:
                 if event.type == pygame.QUIT:
                     sys.exit()
 
                 self.buttonResponseToMouseEvent(event)
+
+            global HEURISTIC_USED
+            selectedOption = heuristicComboBox.update(event_list)
+            heuristicComboBox.draw(screen)
+            if selectedOption != HEURISTIC_USED:
+                HEURISTIC_USED = selectedOption if selectedOption != -1 else HEURISTIC_USED
+                self.refreshSettingsMenu()
 
     def setupSettingsMenu(self):
         """
@@ -1294,6 +1234,7 @@ class SettingsWindow:
         """
         pygame.display.flip()
         pygame.display.set_caption('Smart Connect4 :) - Game Settings')
+        self.setupSettingsMenuButtons()
         self.refreshSettingsMenu()
 
     def refreshSettingsMenu(self):
@@ -1306,7 +1247,15 @@ class SettingsWindow:
         self.drawSettingsMenuLabels()
 
     def drawSettingsMenuButtons(self):
-        global backButton, modifyDepthButton, pruningCheckbox, transpositionCheckbox, backIcon, backIconAccent
+        self.reloadBackButton(backIcon)
+        self.togglePruningCheckbox(toggle=False)
+        self.toggleTranspositionCheckbox(toggle=False)
+        modifyDepthButton.draw(BLACK)
+        heuristicComboBox.draw(screen)
+
+    def setupSettingsMenuButtons(self):
+        global backButton, modifyDepthButton, pruningCheckbox, \
+            transpositionCheckbox, backIcon, backIconAccent, heuristicComboBox
 
         backIconAccent = pygame.image.load('GUI/back-icon.png').convert_alpha()
         backIcon = pygame.image.load('GUI/back-icon-accent.png').convert_alpha()
@@ -1335,6 +1284,12 @@ class SettingsWindow:
             x=30, y=transpositionCheckbox.y + transpositionCheckbox.height + 20,
             width=200, height=50, text="Modify search depth k")
         modifyDepthButton.draw(BLACK)
+
+        heuristicComboBox = OptionBox(x=30, y=modifyDepthButton.y + modifyDepthButton.height + 20,
+                                      width=200, height=50, color=LIGHTGREY, highlight_color=GOLD, selected=HEURISTIC_USED,
+                                      font=pygame.font.SysFont("comicsans", 15),
+                                      option_list=['Heuristic V1', 'Heuristic V2'])
+        heuristicComboBox.draw(screen)
 
     def reloadBackButton(self, icon):
         backButton.draw()
@@ -1375,6 +1330,7 @@ class SettingsWindow:
         pruningCaption = captionFont1_Arial.render("Use alpha-beta pruning", True, WHITE)
         transpositionCaption = captionFont1_Arial.render("Use transposition table", True, WHITE)
         depthCaption = captionFont2_Arial.render("k = " + str(engine.BOARD.getDepth()), True, WHITE)
+        heuristicCaption = captionFont2_Arial.render("Heuristic in use", True, WHITE)
         backLabel = captionFont2_SansSerif.render("BACK", True, WHITE)
 
         screen.blit(backLabel, (backButton.x + 5, backButton.y + backButton.height + 8))
@@ -1398,6 +1354,10 @@ class SettingsWindow:
         screen.blit(depthCaption,
                     (modifyDepthButton.x + modifyDepthButton.width + 10,
                      modifyDepthButton.y + depthCaption.get_height() / 3))
+
+        screen.blit(heuristicCaption,
+                    (heuristicComboBox.rect.x + heuristicComboBox.rect.width + 10,
+                     heuristicComboBox.rect.y + depthCaption.get_height() / 3))
 
     def buttonResponseToMouseEvent(self, event):
         """
@@ -1446,6 +1406,132 @@ class SettingsWindow:
         if temp is not None and temp > 0:
             engine.BOARD.setDepth(temp)
         self.refreshSettingsMenu()
+
+
+class Button:
+    def __init__(self, window, color, x, y, width, height, text='', isChecked=False, gradCore=False, coreLeftColor=None,
+                 coreRightColor=None, gradOutline=False, outLeftColor=None, outRightColor=None, shape='rect'):
+        self.color = color
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.text = text
+        self.screen = window
+        self.isChecked = isChecked
+        self.gradCore = gradCore
+        self.coreLeftColor = coreLeftColor
+        self.coreRightColor = coreRightColor
+        self.gradOutline = gradOutline
+        self.outLeftColor = outLeftColor
+        self.outRightColor = outRightColor
+        self.shape = shape
+
+    def draw(self, outline=None, outlineThickness=2, font='comicsans', fontSize=15, fontColor=BLACK):
+        """
+        Draws the button on screen
+        """
+        if self.shape.lower() == 'rect':
+            if outline:
+                rectOutline = pygame.draw.rect(self.screen, outline, (self.x, self.y,
+                                                                      self.width, self.height), 0)
+                if self.gradOutline:
+                    gradientRect(self.screen, self.outLeftColor, self.outRightColor, rectOutline)
+            button = pygame.draw.rect(self.screen, self.color, (self.x + outlineThickness, self.y + outlineThickness,
+                                                                self.width - 2 * outlineThickness,
+                                                                self.height - 2 * outlineThickness), 0)
+            if self.gradCore:
+                gradientRect(self.screen, self.coreLeftColor, self.coreRightColor, button, self.text, font, fontSize)
+
+            if self.text != '':
+                font = pygame.font.SysFont(font, fontSize)
+                text = font.render(self.text, True, fontColor)
+                self.screen.blit(text, (
+                    self.x + (self.width / 2 - text.get_width() / 2),
+                    self.y + (self.height / 2 - text.get_height() / 2)))
+        elif self.shape.lower() == 'ellipse':
+            if outline:
+                rectOutline = pygame.draw.ellipse(self.screen, outline, (self.x, self.y,
+                                                                         self.width, self.height), 0)
+            button = pygame.draw.ellipse(self.screen, self.color, (self.x + outlineThickness, self.y + outlineThickness,
+                                                                   self.width - 2 * outlineThickness,
+                                                                   self.height - 2 * outlineThickness), 0)
+            if self.text != '':
+                font = pygame.font.SysFont(font, fontSize)
+                text = font.render(self.text, True, fontColor)
+                self.screen.blit(text, (
+                    self.x + (self.width / 2 - text.get_width() / 2),
+                    self.y + (self.height / 2 - text.get_height() / 2)))
+        else:
+            button = pygame.draw.circle(self.screen, self.color, (self.x + outlineThickness, self.y + outlineThickness,
+                                                                  self.width - 2 * outlineThickness,
+                                                                  self.height - 2 * outlineThickness), 0)
+        return self, button
+
+    def isOver(self, pos):
+        # Pos is the mouse position or a tuple of (x,y) coordinates
+        if self.x < pos[0] < self.x + self.width:
+            if self.y < pos[1] < self.y + self.height:
+                return True
+
+        return False
+
+
+class OptionBox:
+
+    def __init__(self, x, y, width, height, color, highlight_color, option_list, font, selected=0):
+        self.color = color
+        self.highlight_color = highlight_color
+        self.rect = pygame.Rect(x, y, width, height)
+        self.font = font
+        self.option_list = option_list
+        self.selected = selected
+        self.draw_menu = False
+        self.menu_active = False
+        self.active_option = -1
+
+    def draw(self, surf):
+        pygame.draw.rect(surf, self.highlight_color if self.menu_active else self.color, self.rect)
+        pygame.draw.rect(surf, (0, 0, 0), self.rect, 2)
+        msg = self.font.render(self.option_list[self.selected], 1, (0, 0, 0))
+        surf.blit(msg, msg.get_rect(center=self.rect.center))
+
+        if self.draw_menu:
+            for i, text in enumerate(self.option_list):
+                rect = self.rect.copy()
+                rect.y += (i + 1) * self.rect.height
+                pygame.draw.rect(surf, self.highlight_color if i == self.active_option else self.color, rect)
+                msg = self.font.render(text, 1, (0, 0, 0))
+                surf.blit(msg, msg.get_rect(center=rect.center))
+            outer_rect = (
+                self.rect.x, self.rect.y + self.rect.height, self.rect.width, self.rect.height * len(self.option_list))
+            pygame.draw.rect(surf, (0, 0, 0), outer_rect, 2)
+
+    def update(self, event_list):
+        mpos = pygame.mouse.get_pos()
+        self.menu_active = self.rect.collidepoint(mpos)
+
+        self.active_option = -1
+        if self.draw_menu:
+            for i in range(len(self.option_list)):
+                rect = self.rect.copy()
+                rect.y += (i + 1) * self.rect.height
+                if rect.collidepoint(mpos):
+                    self.active_option = i
+                    break
+
+        if not self.menu_active and self.active_option == -1:
+            self.draw_menu = False
+
+        for event in event_list:
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                if self.menu_active:
+                    self.draw_menu = not self.draw_menu
+                elif self.draw_menu and self.active_option >= 0:
+                    self.selected = self.active_option
+                    self.draw_menu = False
+                    return self.active_option
+        return -1
 
 
 def gradientRect(window, left_colour, right_colour, target_rect, text=None, font='comicsans', fontSize=15):
