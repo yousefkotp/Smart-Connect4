@@ -31,7 +31,7 @@ Intelligent Agent to play Connect-4 with a modifiable depth.
 
 
 ## State Representation
-- The simplest way to represent the board is using a 2D array. However, using 2D array uses ($6\times 7\times size of integer). This representation would limits the agent by only reaching short search depth and doesn't enable the agent to go deep in the search tree.
+- The simplest way to represent the board is using a 2D array. However, using 2D array uses ( $6\times 7\times size of integer$ ). This representation would limits the agent by only reaching short search depth and doesn't enable the agent to go deep in the search tree.
 - The board configuration (state) is represented as 64-bit number as each column takes 9 bits and is represented as follows:
     - A 3 bits for each column which points to the last empty location, we can call them last location mask, for example if the three bits is "001" indeicates that the next location is the first row
     - A 6 bits representing each slot inside that column, 0 for the human and 1 for the intelligent agent.
@@ -78,33 +78,35 @@ Intelligent Agent to play Connect-4 with a modifiable depth.
 
 ### Heuristic Pruning
 - Heuristic pruning is a modified version of minimax algorithm used in games that has high branching factor of states and high depth.
-- we simulate the game until certain depth (entered by the user) and then we calculate the heuristic value that estimates the power of current states compared to other states to choose the best choice according to the minimax algorithm
-- certain weighting criteria is developed by us to evaluate the strength of the moves.
+- We simulate the game until certain depth (entered by the user) and then we calculate the heuristic value that estimates the power of current states compared to other states to choose the best choice according to the minimax algorithm
+- Certain weighting criteria is developed by us to evaluate the strength of the moves.
 - In this Program we offer 2 heuristics:
 - The more intuitive and simple one:
-    * 4 consecutive (AI color) gets 4 points
-    * 3 candidate consecutive (AI color) gets 3 points
-    * 2 candidate consecutive (AI color) gets 2 points
-    * stopping opponent from getting a point gets 1 point
-    * 4 consecutive (Human color) gets -4 points
-    * 3 candidate consecutive (Human color) gets -3 points
-    * 2 candidate consecutive (Human color) gets -2 points
-    * stopping AI from getting a point gets -1 point
+   - Positive part
+     * 4 consecutive (AI color) gets 4 points
+     * 3 candidate consecutive (AI color) gets 3 points
+     * 2 candidate consecutive (AI color) gets 2 points
+     * stopping opponent from getting a point gets 1 point
+   - Negative part
+     * 4 consecutive (Human color) gets -4 points
+     * 3 candidate consecutive (Human color) gets -3 points
+     * 2 candidate consecutive (Human color) gets -2 points
+     * stopping AI from getting a point gets -1 point
 - The more aware heuristic :
-    - (Positive part)
-    * 4 consecutive (AI color) gets 40 points
-    * 3 candidate consecutive (AI color) gets 17 points (next move will gaurantee the point)
-    * 3 candidate consecutive (AI color) gets 15 points (a colomn is not build yet)
-    * 2 candidate consecutive (AI color) gets 4 points (next move will gaurantee the point)
-    * 2 candidate consecutive (AI color) gets 2 points (a colomn is not build yet)
-    * stopping opponent from getting a point gets 13 point
-    - (Negative part)
-    * 4 consecutive (Human color) gets -40 points
-    * 3 candidate consecutive (Human color) gets -17 points (next move will gaurantee the point)
-    * 3 candidate consecutive (Human color) gets -15 points (a colomn is not build yet)
-    * 2 candidate consecutive (Human color) gets -4 points (next move will gaurantee the point)
-    * 2 candidate consecutive (Human color) gets -2 points (a colomn is not build yet)
-    * stopping AI from getting a point gets -13 point
+   - Positive part
+     * 4 consecutive (AI color) gets 40 points
+     * 3 candidate consecutive (AI color) gets 17 points (next move will gaurantee the point)
+     * 3 candidate consecutive (AI color) gets 15 points (a colomn is not build yet)
+     * 2 candidate consecutive (AI color) gets 4 points (next move will gaurantee the point)
+     * 2 candidate consecutive (AI color) gets 2 points (a colomn is not build yet)
+     * stopping opponent from getting a point gets 13 point
+   - Negative part
+     * 4 consecutive (Human color) gets -40 points
+     * 3 candidate consecutive (Human color) gets -17 points (next move will gaurantee the point)
+     * 3 candidate consecutive (Human color) gets -15 points (a colomn is not build yet)
+     * 2 candidate consecutive (Human color) gets -4 points (next move will gaurantee the point)
+     * 2 candidate consecutive (Human color) gets -2 points (a colomn is not build yet)
+     * stopping AI from getting a point gets -13 point
     
 ### Alpha-Beta Pruning
 - Alpha-Beta pruning is a modified version of the minimax algorithm to optimize it.
