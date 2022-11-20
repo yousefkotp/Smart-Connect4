@@ -1272,7 +1272,7 @@ class SettingsWindow:
         self.togglePruningCheckbox(toggle=False)
 
         transpositionCheckbox = Button(
-            screen, color=WHITE,
+            screen, color=LIGHTGREY,
             x=30, y=pruningCheckbox.y + pruningCheckbox.height + 20,
             width=30, height=30, text="",
             gradCore=useTranspositionTable, coreLeftColor=DARKGOLD, coreRightColor=GOLD,
@@ -1329,7 +1329,7 @@ class SettingsWindow:
         mainLabel = titleFont.render("Game Settings", True, WHITE)
         aiSettingsSubtitle = subTitleFont.render("AI Settings", True, WHITE)
         pruningCaption = captionFont1_Arial.render("Use alpha-beta pruning", True, WHITE)
-        transpositionCaption = captionFont1_Arial.render("Use transposition table", True, WHITE)
+        transpositionCaption = captionFont1_Arial.render("Use transposition table", True, GREY)
         depthCaption = captionFont2_Arial.render("k = " + str(engine.BOARD.getDepth()), True, WHITE)
         heuristicCaption = captionFont2_Arial.render("Heuristic in use", True, WHITE)
         backLabel = captionFont2_SansSerif.render("BACK", True, WHITE)
@@ -1371,7 +1371,8 @@ class SettingsWindow:
             elif pruningCheckbox.isOver(event.pos):
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
             elif transpositionCheckbox.isOver(event.pos):
-                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+                # pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+                pass
             elif backButton.isOver(event.pos):
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
                 self.reloadBackButton(backIconAccent)
@@ -1386,7 +1387,8 @@ class SettingsWindow:
             elif pruningCheckbox.isOver(event.pos):
                 self.togglePruningCheckbox()
             elif transpositionCheckbox.isOver(event.pos):
-                self.toggleTranspositionCheckbox()
+                # self.toggleTranspositionCheckbox()
+                pass
             elif backButton.isOver(event.pos):
                 if gameInSession:
                     gameWindow = GameWindow()
