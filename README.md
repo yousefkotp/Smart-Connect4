@@ -80,6 +80,8 @@ Intelligent Agent to play Connect-4 with a modifiable depth.
 - Heuristic pruning is a modified version of minimax algorithm used in games that has high branching factor of states and high depth.
 - we simulate the game until certain depth (entered by the user) and then we calculate the heuristic value that estimates the power of current states compared to other states to choose the best choice according to the minimax algorithm
 - certain weighting criteria is developed by us to evaluate the strength of the moves.
+- In this Program we offer 2 heuristics:
+- The more intuitive and simple one:
     * 4 consecutive (AI color) gets 4 points
     * 3 candidate consecutive (AI color) gets 3 points
     * 2 candidate consecutive (AI color) gets 2 points
@@ -88,7 +90,7 @@ Intelligent Agent to play Connect-4 with a modifiable depth.
     * 3 candidate consecutive (Human color) gets -3 points
     * 2 candidate consecutive (Human color) gets -2 points
     * stopping AI from getting a point gets -1 point
-- OR 3ala hasab ma nekhtar bokra
+- The more aware heuristic :
     - (Positive part)
     * 4 consecutive (AI color) gets 40 points
     * 3 candidate consecutive (AI color) gets 17 points (next move will gaurantee the point)
@@ -103,8 +105,7 @@ Intelligent Agent to play Connect-4 with a modifiable depth.
     * 2 candidate consecutive (Human color) gets -4 points (next move will gaurantee the point)
     * 2 candidate consecutive (Human color) gets -2 points (a colomn is not build yet)
     * stopping AI from getting a point gets -13 point
-
-
+    
 ### Alpha-Beta Pruning
 - Alpha-Beta pruning is a modified version of the minimax algorithm to optimize it.
 - Alpha-Beta can be a real game changer, it cannot eliminate the exponent, but it can cuts it to half.
