@@ -77,6 +77,9 @@ Intelligent Agent to play Connect-4 with a modifiable depth.
 - Since that branching factor in connect-4 is 7, and the depth is 42, then the total number of states to search is 7^42 which is nearly equals 3x10^35 state. The agent needs to use some pruning to enhance the runtime and work in real time.
 
 ### Heuristic Pruning
+- Heuristic pruning is a modified version of minimax algorithm used in games that has high branching factor of states and high depth.
+- we simulate the game until certain depth (entered by the user) and then we calculate the heuristic value that estimates the power of current states compared to other states to choose the best choice according to the minimax algorithm
+- certain weighting criteria is developed by us to evaluate the strength of the moves.
 
 ### Alpha-Beta Pruning
 - Alpha-Beta pruning is a modified version of the minimax algorithm to optimize it.
