@@ -82,29 +82,29 @@ Intelligent Agent to play Connect-4 with a modifiable depth.
 - certain weighting criteria is developed by us to evaluate the strength of the moves.
 - In this Program we offer 2 heuristics:
 - The more intuitive and simple one:
-    * 4 consecutive (AI color) gets 4 points
-    * 3 candidate consecutive (AI color) gets 3 points
-    * 2 candidate consecutive (AI color) gets 2 points
-    * stopping opponent from getting a point gets 1 point
-    * 4 consecutive (Human color) gets -4 points
-    * 3 candidate consecutive (Human color) gets -3 points
-    * 2 candidate consecutive (Human color) gets -2 points
-    * stopping AI from getting a point gets -1 point
+     * 4 consecutive (AI color) gets 4 points
+     * 3 candidate consecutive (AI color) gets 3 points
+     * 2 candidate consecutive (AI color) gets 2 points
+     * stopping opponent from getting a point gets 1 point
+     * 4 consecutive (Human color) gets -4 points
+     * 3 candidate consecutive (Human color) gets -3 points
+     * 2 candidate consecutive (Human color) gets -2 points
+     * stopping AI from getting a point gets -1 point
 - The more aware heuristic :
     - (Positive part)
-    * 4 consecutive (AI color) gets 40 points
-    * 3 candidate consecutive (AI color) gets 17 points (next move will gaurantee the point)
-    * 3 candidate consecutive (AI color) gets 15 points (a colomn is not build yet)
-    * 2 candidate consecutive (AI color) gets 4 points (next move will gaurantee the point)
-    * 2 candidate consecutive (AI color) gets 2 points (a colomn is not build yet)
+     * 4 consecutive (AI color) gets 40 points
+     * 3 candidate consecutive (AI color) gets 17 points (next move will gaurantee the point)
+     * 3 candidate consecutive (AI color) gets 15 points (a colomn is not build yet)
+     * 2 candidate consecutive (AI color) gets 4 points (next move will gaurantee the point)
+     * 2 candidate consecutive (AI color) gets 2 points (a colomn is not build yet)
     * stopping opponent from getting a point gets 13 point
     - (Negative part)
-    * 4 consecutive (Human color) gets -40 points
-    * 3 candidate consecutive (Human color) gets -17 points (next move will gaurantee the point)
-    * 3 candidate consecutive (Human color) gets -15 points (a colomn is not build yet)
-    * 2 candidate consecutive (Human color) gets -4 points (next move will gaurantee the point)
-    * 2 candidate consecutive (Human color) gets -2 points (a colomn is not build yet)
-    * stopping AI from getting a point gets -13 point
+     * 4 consecutive (Human color) gets -40 points
+     * 3 candidate consecutive (Human color) gets -17 points (next move will gaurantee the point)
+     * 3 candidate consecutive (Human color) gets -15 points (a colomn is not build yet)
+     * 2 candidate consecutive (Human color) gets -4 points (next move will gaurantee the point)
+     * 2 candidate consecutive (Human color) gets -2 points (a colomn is not build yet)
+     * stopping AI from getting a point gets -13 point
     
 ### Alpha-Beta Pruning
 - Alpha-Beta pruning is a modified version of the minimax algorithm to optimize it.
