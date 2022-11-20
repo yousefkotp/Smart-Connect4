@@ -1288,8 +1288,6 @@ class SettingsWindow:
 
                 self.buttonResponseToMouseEvent(event)
 
-        startGameSession()
-
     def setupSettingsMenu(self):
         """
         Initializes the all components in the frame
