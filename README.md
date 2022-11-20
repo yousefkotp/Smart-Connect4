@@ -243,7 +243,7 @@ Intelligent Agent to play Connect-4 with a modifiable depth.
 
 ### Settings Interface
 
-![image](https://user-images.githubusercontent.com/41492875/202769668-6d1438b5-48e9-4025-b410-646de5748d73.png)
+![settingsss](https://user-images.githubusercontent.com/90573502/202927516-db42e77c-f47a-4af2-bfbb-6cb53a103b47.jpg)
 
 ## Contributors
 
