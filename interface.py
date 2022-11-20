@@ -420,7 +420,7 @@ class GameWindow:
                     alterButtonAppearance(playAgainButton, GOLD, BLACK)
 
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if GAME_MODE == SINGLE_PLAYER and not GAME_OVER and showStatsButton.isOver(event.pos):
+            if GAME_MODE == SINGLE_PLAYER and not GAME_OVER and showStatsButton.isOver(event.pos) and moveMade:
                 alterButtonAppearance(showStatsButton, CYAN, BLACK)
             elif contributorsButton.isOver(event.pos):
                 alterButtonAppearance(contributorsButton, CYAN, BLACK)
@@ -438,7 +438,7 @@ class GameWindow:
                 settingsWindow.show()
 
         if event.type == pygame.MOUSEBUTTONUP:
-            if GAME_MODE == SINGLE_PLAYER and not GAME_OVER and showStatsButton.isOver(event.pos):
+            if GAME_MODE == SINGLE_PLAYER and not GAME_OVER and showStatsButton.isOver(event.pos) and moveMade:
                 alterButtonAppearance(showStatsButton, LIGHTGREY, BLACK)
                 treevisualizer = TreeVisualizer()
                 treevisualizer.switch()
@@ -561,10 +561,11 @@ class GameWindow:
         """
         Resets everything back to default values
         """
-        global GAME_BOARD, PLAYER_SCORE, GAME_OVER, TURN
+        global GAME_BOARD, PLAYER_SCORE, GAME_OVER, TURN, moveMade
         PLAYER_SCORE = [0, 0, 0]
         GAME_OVER = False
         TURN = 1
+        moveMade = False
         self.setupGameWindow()
 
     def getNewMove(self, newState, oldState) -> int:
