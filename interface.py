@@ -1290,7 +1290,7 @@ class SettingsWindow:
                                       width=200, height=50, color=LIGHTGREY, highlight_color=GOLD,
                                       selected=HEURISTIC_USED,
                                       font=pygame.font.SysFont("comicsans", 15),
-                                      option_list=['Heuristic V1', 'Heuristic V2'])
+                                      option_list=['V1 (faster)', 'V2 (more aware)'])
         heuristicComboBox.draw(screen)
 
     def reloadBackButton(self, icon):
