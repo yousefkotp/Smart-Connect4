@@ -480,14 +480,15 @@ class GameWindow:
         gameInSession = True
         nodeStack.clear()
 
-        if AI_PLAYS_FIRST and not GAME_OVER:
-            switchTurn()
-            self.player2Play()
-            moveMade = True
-            AI_PLAYS_FIRST = False
-
         while True:
+
+            if AI_PLAYS_FIRST and not moveMade:
+                switchTurn()
+                self.player2Play()
+                moveMade = True
+
             pygame.display.update()
+
             if not GAME_OVER:
                 self.hoverPieceOverSlot()
 
