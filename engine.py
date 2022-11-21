@@ -180,6 +180,10 @@ def check_neigbours2(x, y, value, array,state):
             cost += 17
         if temp == 3 and map[array[x - 3][y + 3]] == 0 and level==3:
             cost += 15
+        if temp == 2 and map[array[x - 3][y + 3]] == 0 and level == 4:
+            cost += 4
+        if temp == 2 and map[array[x - 3][y + 3]] == 0 and level == 3:
+            cost += 2
 
     if x >= 3 and y >= 3:
         temp = 0
@@ -192,6 +196,11 @@ def check_neigbours2(x, y, value, array,state):
             cost += 17
         if temp == 3 and map[array[x - 3][y - 3]] == 0 and level == 3:
             cost += 15
+        if temp == 2 and map[array[x - 3][y - 3]] == 0 and level == 4:
+            cost += 4
+        if temp == 2 and map[array[x - 3][y - 3]] == 0 and level == 3:
+            cost += 2
+
 
     if x <= 2 and y <= 3:
         temp = 0
