@@ -2,7 +2,7 @@
 Intelligent Agent to play Connect-4 with a modifiable depth. App also offers a GUI decision tree visualizer to trace the minimax algorithm execution.
 
 ## Table of Content
-- [connect4](#connect4)
+- [Smart Connect4](#smart-connect4)
   * [Deployment](#deployment)
   * [State Representation](#state-representation)
   * [MiniMax Algorithm](#minimax-algorithm)
